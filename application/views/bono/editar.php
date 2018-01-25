@@ -2,7 +2,7 @@
 <input type="hidden" id="origen" value="<?php echo $origen;?>" >
 <div id="ventanaBono">
     <div id="titulo">
-        Editar Orden Richmond
+        Editar Orden CEPU
     </div>
     <div>
         <form id="form">
@@ -91,9 +91,9 @@
         var tipoInversor = [
             {value: 'I', label: 'Institucional'},
             {value: 'M', label: 'Minorista'},
-            {value: 'P', label: 'Cartera Propia'},
-            {value: 'R', label: 'No Residente'},
-            {value: 'C', label: 'Corporativo'}
+            {value: 'P', label: 'Cartera Propia'}/*,
+             {value: 'R', label: 'No Residente'}, 
+            {value: 'C', label: 'Corporativo'}*/
         ];
         $("#tipoInversor").jqxDropDownList({ width: '300px', height: '25px', source: tipoInversor, theme: theme, placeHolder: 'elija el tipo de inversor'});
         var monedas = [
@@ -103,15 +103,15 @@
         $("#moneda").jqxDropDownList({ width: '300px', height: '25px', source: monedas, theme: theme, placeHolder: 'elija la moneda', disabled: false});
         
         $("#moneda").jqxDropDownList('selectIndex', 0);
-        $("#moneda").jqxDropDownList({disabled: true});
+        //$("#moneda").jqxDropDownList({disabled: true});
         
-        //$("#cable").jqxCheckBox({height: '20px', theme: theme});
+        $("#cable").jqxCheckBox({height: '20px', theme: theme});
         /*
         $("#plazo").jqxDropDownList({ width: '110px', height: '25px', theme: theme, placeHolder: 'elija plazo'});
         */
         $("#comision").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 1, groupSeparator: ' ', max: 99, theme: theme});
         $("#cantidad").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999, theme: theme});
-        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 2, groupSeparator: ' ', max: 99.99, theme: theme});
+        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 3, digits: 2, groupSeparator: ' ', max: 99.999, theme: theme});
         //$("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 6, digits: 4, groupSeparator: ' ', max: 9999.999999, theme: theme});
         $("#comitente").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
         $("#tipoPersona").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
@@ -150,7 +150,7 @@
                     $("#filaCable").hide();
                     $("#cable").jqxCheckBox('uncheck');
                 } else {
-                    //$("#filaCable").show();
+                    $("#filaCable").show();
                 }
             }
         });
@@ -187,7 +187,7 @@
         */
     
         if ($("#id").val() == 0){
-            $("#titulo").text('Nueva Orden Richmond');
+            $("#titulo").text('Nueva Orden CEPU');
             $("#filaCable").hide();
             /*
              * 
@@ -203,7 +203,7 @@
             }, 'json');
             */
         } else {
-            $("#titulo").text('Editar Orden Richmond');
+            $("#titulo").text('Editar Orden CEPU');
             var datos = {
                 id: $("#id").val()
             };
@@ -295,15 +295,15 @@
                     }
                 }}
                 */
-                { input: '#precio', message: 'El precio debe ser mayor o igual que 20!', action: 'keyup, blur',  rule: function(){
-                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && ($("#precio").val() < 20)) {
+                { input: '#precio', message: 'El precio debe ser mayor o igual que 0.01!', action: 'keyup, blur',  rule: function(){
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && ($("#precio").val() < 0.01)) {
                         return false;
                     } else {
                         return true;
                     }
                 }},
-                { input: '#precio', message: 'El precio debe ser menor o igual que 70!', action: 'keyup, blur',  rule: function(){
-                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && ($("#precio").val() > 70)) {
+                { input: '#precio', message: 'El precio debe ser menor o igual que 80!', action: 'keyup, blur',  rule: function(){
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && ($("#precio").val() > 80)) {
                         return false;
                     } else {
                         return true;

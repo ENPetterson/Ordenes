@@ -9,5 +9,7 @@ class EnviarMails extends CI_Controller{
         $this->Bono_model->enviarMailsCierre();
         $this->load->model('Cupon_model');
         $this->Cupon_model->enviarMailsCierre();
+        $this->load->model('LetesPesos_model');
+        $this->LetesPesos_model->enviarMailsCierre();
     }
 }

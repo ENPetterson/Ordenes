@@ -47,9 +47,14 @@
         <td><button class="btn" id="btnLetes">Letes<div id="cierreLetes" class="texto-cierre"></div></button></td>
     </tr>
     <tr>
-        <td style="padding-top: 5em"><button class="btn" id="btnBono">RICHMOND<div id="cierreBono" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnBono">CEPU<div id="cierreBono" class="texto-cierre"></div></button></td>
         <td style="padding-top: 5em"><button class="btn" id="btnCupon">INVJ Cupones<div id="cierreCupon" class="texto-cierre"></div></button></td>
     </tr>
+    <tr>
+        <td style="padding-top: 5em"><button class="btn" id="btnLetesPesos">Letes Pesos<div id="cierreLetesPesos" class="texto-cierre"></div></button></td>
+        <td>&nbsp;</td>
+    </tr>
+    
 </table>
 <script>
     $(function(){
@@ -165,6 +170,29 @@
             $('#cierreCupon').html('No hay licitaciones abiertas');
         }
         
+        $.post('letesPesos/getCierreActual', function(cierre){
+             if (cierre.cerrado){
+                 periodoCerradoLetesPesos();
+             } else {
+                 var fechaCierre = moment(cierre.fechahora).format('YYYY/MM/DD HH:mm:ss');
+                 $('#cierreLetesPesos').countdown(fechaCierre, function(event) {
+                 var $this = $(this).html(event.strftime(''
+                    + 'Cierre en <span>%w</span> semanas <span>%d</span> días '
+                    + '<span>%H</span> horas '
+                    + '<span>%M</span> minutos '
+                    + '<span>%S</span> segundos'));
+                  });
+                  $('#cierreLetesPesos').on('finish.countdown', function(){
+                      periodoCerradoLetesPesos();
+                  });
+             }
+        }, 'json');
+
+        function periodoCerradoLetesPesos(){
+            $('#cierreLetesPesos').html('No hay licitaciones abiertas');
+        }
+        
+        
         $("#btnLebacs").click(function(){
             $.redirect('/lebac');
         });
@@ -179,6 +207,10 @@
         
         $("#btnCupon").click(function(){
             $.redirect('/cupon');
+        });
+        
+        $("#btnLetesPesos").click(function(){
+            $.redirect('/letesPesos');
         });
         
     });

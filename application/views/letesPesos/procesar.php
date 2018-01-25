@@ -4,7 +4,7 @@
         var theme = getTheme();
         var id = 0;
         var enviar = [];
-        var cierre_id = 0;
+        var cierreletespesos_id = 0;
         var cierreFecha;
         
         var srcCierre = {
@@ -14,13 +14,13 @@
                 { name: 'fechahora' }
             ],
             id: 'id',
-            url: '/bono/getCierres',
+            url: '/letesPesos/getCierres',
             async: false
         };
         var DACierre = new $.jqx.dataAdapter(srcCierre);
         
         $("#cierre").on('bindingComplete', function(event){
-            $.post('/bono/getCierreActual', function(cierre){
+            $.post('/letesPesos/getCierreActual', function(cierre){
                 if (!cierre.cerrado){
                     $("#cierre").jqxDropDownList('val', cierre.id);
                 }
@@ -34,7 +34,7 @@
         });
         
         $('#cierre').on('change', function (event)        {  
-            source.data = {cierrebono_id: event.args.item.value};
+            source.data = {cierreletespesos_id: event.args.item.value};
             $("#grilla").jqxGrid('updatebounddata');
             $("#excelButton").jqxButton({disabled: false });
             cierreFecha = event.args.item.label;
@@ -48,11 +48,11 @@
                 { name: 'numComitente', type: 'number'},
                 { name: 'moneda'},
                 { name: 'cable', type: 'bool'},
-                /*
                 { name: 'plazo', type: 'number'},
-                */
                 { name: 'comision', type: 'float'},
                 { name: 'cantidad', type: 'number'},
+                { name: 'tenencia', type: 'number'},
+                { name: 'posicion', type: 'number'},
                 { name: 'precio', type: 'float'},
                 { name: 'comitente'},
                 { name: 'tipoPersona'},
@@ -65,8 +65,8 @@
                 { name: 'fhenvio', type: 'date', format: 'yyyy-MM-dd HH:mm:ss'}
             ],
             cache: false,
-            url: '/bono/procesarGrilla',
-            data: {cierrebono_id: cierre_id},
+            url: '/letesPesos/procesarGrilla',
+            data: {cierreletespesos_id: cierreletespesos_id},
             type: 'post'
         };
         
@@ -78,7 +78,6 @@
                 source: dataadapter,
                 theme: theme,
                 filterable: true,
-                filtermode: 'excel',
                 sortable: true,
                 pageable: false,
                 virtualmode: false,
@@ -87,7 +86,7 @@
                 showstatusbar: true,
                 statusbarheight: 25,
                 showaggregates: true,
-                width: 1610,
+                width: 1680,
                 height: 400,
                 columns: [
                         { text: 'Id', datafield: 'id', width: 80, cellsalign: 'right', cellsformat: 'd', aggregates: ['count'] },
@@ -95,11 +94,11 @@
                         { text: 'Nro Comitente', datafield: 'numComitente', width: 70},
                         { text: 'Mone', datafield: 'moneda', width: 30},
                         { text: 'Cable', datafield: 'cable', width: 30, columntype: 'checkbox'},
-                        /*
                         { text: 'Plazo', datafield: 'plazo', width: 40, cellsalign: 'right'},
-                        */
                         { text: 'Comis', datafield: 'comision', width: 60, cellsalign: 'right', cellsformat: 'd4'},
                         { text: 'Cantidad', datafield: 'cantidad', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum'] },
+                        { text: 'Tenencia', datafield: 'tenencia', width: 140, cellsalign: 'right', cellsformat: 'd' },
+                        { text: 'Posicion', datafield: 'posicion', width: 140, cellsalign: 'right', cellsformat: 'd' , hidden: true},
                         { text: 'Precio', datafield: 'precio', width: 100, cellsalign: 'right', cellsformat: 'd10'},
                         { text: 'Comitente', datafield: 'comitente', width: 200},
                         { text: 'Tipo Per', datafield: 'tipoPersona', width: 80},
@@ -124,30 +123,40 @@
         });
         
         
+        
         $("#enviarSantanderButton").jqxButton({ width: '160', theme: theme, disabled: true });
         $("#enviarMercadoButton").jqxButton({ width: '160', theme: theme, disabled: true });
         $("#editarButton").jqxButton({ width: '160', theme: theme, disabled: true });
         $("#anularButton").jqxButton({ width: '160', theme: theme, disabled: true });
         
+
         $("#enviarSantanderButton").click(function(){
             srcGrillaPreviewSantander.data = {ordenes: enviar};
             $("#grillaPreviewSantander").jqxGrid('updatebounddata');
             $("#ventanaPreviewSantander").jqxWindow('open');
         });
-
-
+        
         $("#enviarMercadoButton").click(function(){
             $("#grilla").ajaxloader();
             var datos = {ordenes: enviar};
             $("#grilla").ajaxloader();
-            $.post('/bono/previewMercado', datos, function(data){
+            $.post('/letesPesos/previewMercado', datos, function(data){
+                
                 $.each(data.uris, function(indice, uri){
-                    $.fileDownload(uri);
+                    $.fileDownload(uri, {  
+                   successCallback: function (url) {  
+                       alert('You just got a file download dialog or ribbon for this URL :' + url); 
+                       },  
+                       failCallback: function (html, url) {    
+                        alert('Your file download just failed for this URL:' + url + '\r\n' +     
+                                              'Here was the resulting error HTML: \r\n' + html);    
+                        }
+                    }                      );
                 });
                 new Messi('Ha enviado los datos al mercado ?' , {title: 'Confirmar',titleClass: 'warning', modal: true,
                     buttons: [{id: 0, label: 'Si', val: 's'}, {id: 1, label: 'No', val: 'n'}], callback: function(val) { 
                         if (val == 's'){
-                            $.post('/bono/enviarMercado', datos, function(data){
+                            $.post('/letesPesos/enviarMercado', datos, function(data){
                                 var titleClass;
                                 if (data.exito == 0){
                                     titleClass = 'error';
@@ -164,8 +173,8 @@
                             $("#grilla").ajaxloader('hide');
                         }
                     }
-                });
-            },'json');
+                });                
+            }, 'json');
         });
         
         $("#anularButton").click(function(){
@@ -176,7 +185,7 @@
                         datos = {
                             ordenes: enviar
                         };
-                        $.post('/bono/anularOrdenes', datos, function(data){
+                        $.post('/letesPesos/anularOrdenes', datos, function(data){
                             new Messi(data.resultado, {title: 'Mensaje', modal: true,
                                 buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: 'error'});
                             $('#grilla').jqxGrid('updatebounddata');
@@ -190,8 +199,11 @@
         });
         
         $("#editarButton").click(function(){
-            $.redirect('/bono/editar', {'id': id, origen: 'procesar'});
+            $.redirect('/letesPesos/editar', {'id': id, origen: 'procesar'});
         });
+        
+
+        
         
         $('#grilla').on('rowselect rowunselect', function (event) {
             enviar = [];
@@ -227,17 +239,17 @@
         
         
         
-        $("#ventanaResumen").jqxWindow({autoOpen: false, keyboardCloseKey: -1, showCloseButton: false, height: '230px', width: '460px', theme: theme, position: 'bottom, left' });
+        $("#ventanaResumen").jqxWindow({autoOpen: false, keyboardCloseKey: -1, showCloseButton: false, height: '230px', width: '410px', theme: theme, position: 'bottom, left' });
         
         var srcGrillaResumen = {
             datatype: "json",
             datafields: [
-                {name: 'tramo'},
-                {name: 'precio', type: 'number'},
+                {name: 'plazo'},
+                {name: 'moneda'},
                 {name: 'cantidadOrdenes', type: 'integer'},
                 {name: 'sumaCantidad', type: 'number'}
             ],
-            url: '/bono/grillaResumen',
+            url: '/letesPesos/grillaResumen',
             data: {ordenes: enviar},
             type: 'post'
         };
@@ -246,7 +258,7 @@
         
         $("#grillaResumen").jqxGrid(
         {
-            width: 450,
+            width: 380,
             height: 190,
             source: daGrillaResumen,
             columnsresize: true,
@@ -254,13 +266,17 @@
             statusbarheight: 25,
             showaggregates: true,
             columns: [
-              { text: 'Tramo', datafield: 'tramo', width: 80 },
-              { text: 'Precio', datafield: 'precio', width: 80, cellsalign: 'right', cellsformat: 'd2' },
+              { text: 'Plazo', datafield: 'plazo', width: 50 },
+              { text: 'Mone', datafield: 'moneda', width: 30 },
               { text: 'Cant Ord', datafield: 'cantidadOrdenes', width: 100, cellsalign: 'right', cellsformat: 'n', aggregates: ['sum']  },
               { text: 'Total VN', datafield: 'sumaCantidad', width: 180, cellsalign: 'right', cellsformat: 'd2', aggregates: ['sum'] }
             ],
             theme: theme
         });
+
+
+
+
 
         $("#ventanaPreviewSantander").jqxWindow({autoOpen: false, keyboardCloseKey: -1, showCloseButton: true, height: '270px', width: '590px', theme: theme});
 
@@ -268,12 +284,13 @@
         var srcGrillaPreviewSantander = {
             datatype: "json",
             datafields: [
+                {name: 'plazo'},
+                {name: 'moneda'},
                 {name: 'especie'},
-                {name: 'tramo' },
                 {name: 'precio', type: 'number'},
                 {name: 'sumaCantidad', type: 'number'}
             ],
-            url: '/bono/previewSantander',
+            url: '/letesPesos/previewSantander',
             data: {ordenes: enviar},
             type: 'post'
         };
@@ -282,7 +299,7 @@
         
         $("#grillaPreviewSantander").jqxGrid(
         {
-            width: 570,
+            width: 560,
             height: 190,
             source: daGrillaPreviewSantander,
             columnsresize: true,
@@ -290,8 +307,9 @@
             statusbarheight: 25,
             showaggregates: true,
             columns: [
+              { text: 'Plazo', datafield: 'plazo', width: 50 },
+              { text: 'Mone', datafield: 'moneda', width: 30 },
               { text: 'Especie', datafield: 'especie', width: 100 },
-              { text: 'Tramo', datafield: 'tramo', width: 100 },
               { text: 'Precio', datafield: 'precio', width: 180, cellsalign: 'right', cellsformat: 'd6' },
               { text: 'Total VN', datafield: 'sumaCantidad', width: 180, cellsalign: 'right', cellsformat: 'd2', aggregates: ['sum'] }
             ],
@@ -302,7 +320,7 @@
 
         $("#aceptarSantander").click(function(){
             var datos = {ordenes: enviar};
-            $.post('/bono/enviarSantander', datos, function(data){
+            $.post('/letesPesos/enviarSantander', datos, function(data){
                 var titleClass;
                 if (data.exito == 0){
                     titleClass = 'error';
