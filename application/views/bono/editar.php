@@ -44,7 +44,7 @@
                 
                 <tr id="filaPrecio">
                     <!--<td style="padding-right:10px; padding-bottom: 10px">Tasa (%): </td>-->
-                    <td style="padding-right:10px; padding-bottom: 10px">Precio: </td>
+                    <td style="padding-right:10px; padding-bottom: 10px">Precio (c/1.000 VNO): </td>
                     <td><div id="precio" ></div></td>
                 </tr>
                 <tr>
@@ -111,7 +111,7 @@
         */
         $("#comision").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 1, groupSeparator: ' ', max: 99, theme: theme});
         $("#cantidad").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999, theme: theme});
-        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 3, digits: 2, groupSeparator: ' ', max: 99.999, theme: theme});
+        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 3, groupSeparator: ' ', max: 999.99, theme: theme});
         //$("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 6, digits: 4, groupSeparator: ' ', max: 9999.999999, theme: theme});
         $("#comitente").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
         $("#tipoPersona").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
@@ -269,7 +269,7 @@
                 { input: '#cantidad', message: 'Cantidad incorrecta!', action: 'keyup, blur',  rule: function(){
                     var result = true;
                     if (minimo == 0){
-                        minimo = 1;
+                        minimo = 10000;
                     }
                     var cantidad = $("#cantidad").val();
                     $('#form').jqxValidator('hideHint', '#cantidad');
@@ -302,8 +302,8 @@
                         return true;
                     }
                 }},
-                { input: '#precio', message: 'El precio debe ser menor o igual que 80!', action: 'keyup, blur',  rule: function(){
-                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && ($("#precio").val() > 80)) {
+                { input: '#precio', message: 'El precio debe ser menor que 1000!', action: 'keyup, blur',  rule: function(){
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && ($("#precio").val() >= 10000)) {
                         return false;
                     } else {
                         return true;

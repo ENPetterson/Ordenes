@@ -76,7 +76,6 @@
                 source: dataadapter,
                 theme: theme,
                 filterable: true,
-                filtermode: 'excel',
                 sortable: true,
                 pageable: false,
                 virtualmode: false,
