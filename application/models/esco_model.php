@@ -18,6 +18,10 @@ class Esco_model extends CI_Model {
                     $this->dbh = new PDO("dblib:host=srv-vbolsa0;dbname=VBolsa", "sa", "25DeMayo");
                     $this->dbhTest = new PDO("dblib:host=srv-vbolsa0;dbname=test", "sa", "25DeMayo");
                     break;
+                case 'desamica':
+                    $this->dbh = new PDO("dblib:host=srv-vbolsa0;dbname=VBolsa", "sa", "25DeMayo");
+                    $this->dbhTest = new PDO("dblib:host=srv-vbolsa0;dbname=test", "sa", "25DeMayo");
+                    break;
                 default:
                     exit('The application environment is not set correctly.');
             }

@@ -8,7 +8,7 @@ Copyright (c) 2012 Reactive Apps, Ronnie Garcia
 $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/tmp/';
 
 // Set the allowed file extensions
-$fileTypes = array('csv'); // Allowed file extensions
+$fileTypes = array('xls','xlsx', 'csv','dat'); // Allowed file extensions
 
 $verifyToken = md5('unique_salt' . $_POST['timestamp']);
 

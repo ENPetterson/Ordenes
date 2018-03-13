@@ -1,6 +1,14 @@
+<?php
+$timestamp = time();
+?>
+
 <script type="text/javascript">
     $(document).ready(function () {
             // prepare the data
+            
+        var timestamp = <?= $timestamp; ?>;
+        var token = '<?= md5('unique_salt' . $timestamp); ?>';    
+            
         var theme = getTheme();
         var id = 0;
         var enviar = [];
@@ -196,7 +204,38 @@
             }
         });
         
-        
+////////////////////////////////////////////////////////////////////////////////   
+        $("#archivoExcel").jqxButton({ width: '300', theme: theme, disabled: false });
+
+                    $('#archivoExcel').uploadifive({
+                        'uploadScript': '/uploadifive.php',
+                        'formData': {
+                            'timestamp': timestamp,
+                            'token': token
+                        },
+                        'buttonText': 'Seleccionar archivo...',
+                        'multi': false,
+                        'queueSizeLimit': 1,
+                        'uploadLimit': 0,
+                        'height': 20,
+                        'width': 200,
+                        'removeCompleted': true,
+                        'onUploadComplete': function(file, data) {
+
+                            datos = {
+                                file: file.name,
+//                                instrumento: instrumento_id,
+                                cierre: $("#cierre").jqxDropDownList('getSelectedItem').value 
+                            };
+
+                            $.post('/lebac/grabarExcel', datos, function(data){
+                                       console.log(data);
+                            }
+                            , 'json');
+                        }
+                    });
+
+////////////////////////////////////////////////////////////////////////////////           
         
     });
 </script>
@@ -210,6 +249,7 @@
             <td><input type="button" value="Editar" id="editarButton"></td>
             <td><input type="button" value="Borrar" id="borrarButton"></td>
             <td><input type="button" value="Enviar a Backoffice" id="enviarButton"></td>
+            <td id='archivoExcelFila'><input type="file" value="Archivo" id="archivoExcel"></td>
         </tr>
     </table>
 </div>
