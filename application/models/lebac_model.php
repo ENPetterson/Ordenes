@@ -612,10 +612,20 @@ class Lebac_model extends CI_Model{
         if($sheet){
             for ($row = 1; $row < 2; $row++){
                 for($column = 0; $column < 11; $column++){
-                    $nombreHoja[] = $sheet->getCellByColumnAndRow($column,$row)->getFormattedValue();                                      
+                    
+                    $nombreHoja = str_replace(
+                                            array('á','é','í','ó','ú'),
+                                            array('a','e','i','o','u'),
+                                            $sheet->getCellByColumnAndRow($column,$row)->getFormattedValue()
+                                        );
+                    
+                    
+                    $nombreHoja = strtolower($nombreHoja);                    
+                    $nombreHojas[] = $nombreHoja;                                    
                 }
             }
-            if($nombreHoja[0] == 'Número' && $nombreHoja[6] == 'Lebacs' && $nombreHoja[9] == 'Comisión' && $nombreHoja[10] == 'Plazo'){
+                        
+            if($nombreHojas[0] == 'numero' && $nombreHojas[6] == 'lebacs' && $nombreHojas[9] == 'comision' && $nombreHojas[10] == 'plazo'){
                 $aprobado = 1;
             }
         }
