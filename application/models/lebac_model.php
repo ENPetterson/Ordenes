@@ -637,6 +637,7 @@ class Lebac_model extends CI_Model{
                     $orden->cuit = $resultado['cuit'];    
                 } 
 
+                $orden->precio = 0;
                 $orden->moneda = '$';
                 $orden->plazo = $plazo;
                 $orden->comision = $comision;
@@ -648,7 +649,8 @@ class Lebac_model extends CI_Model{
                 $orden->cierre = $cierre;
 
                 $this->id = R::store($orden);               
-            }   
+            }
+            return 'OK';
         } else {
             print_r("No se pudo cargar");
         }

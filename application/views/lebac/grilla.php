@@ -207,35 +207,36 @@ $timestamp = time();
 ////////////////////////////////////////////////////////////////////////////////   
         $("#archivoExcel").jqxButton({ width: '300', theme: theme, disabled: false });
 
-                    $('#archivoExcel').uploadifive({
-                        'uploadScript': '/uploadifive.php',
-                        'formData': {
-                            'timestamp': timestamp,
-                            'token': token
-                        },
-                        'buttonText': 'Seleccionar archivo...',
-                        'multi': false,
-                        'queueSizeLimit': 1,
-                        'uploadLimit': 0,
-                        'height': 20,
-                        'width': 200,
-                        'removeCompleted': true,
-                        'onUploadComplete': function(file, data) {
-
-                            datos = {
-                                file: file.name,
-//                                instrumento: instrumento_id,
-                                cierre: $("#cierre").jqxDropDownList('getSelectedItem').value 
-                            };
-
-                            $.post('/lebac/grabarExcel', datos, function(data){
-                                       console.log(data);
-                            }
-                            , 'json');
+        $('#archivoExcel').uploadifive({
+            'uploadScript': '/uploadifive.php',
+            'formData': {
+                'timestamp': timestamp,
+                'token': token
+            },
+            'buttonText': 'Importar Excel...',
+            'multi': false,
+            'queueSizeLimit': 1,
+            'uploadLimit': 0,
+            'height': 20,
+            'width': 200,
+            'removeCompleted': true,
+            'onUploadComplete': function(file) {
+                $.ajax({
+                  method: "POST",
+                  url: '/lebac/grabarExcel',
+                  data: { file: file.name, cierre: $("#cierre").jqxDropDownList('getSelectedItem').value}
+                }).done(function( msg ) {
+                    new Messi('Se han importado las ordenes', {title: 'Confirmar',modal: true,
+                        buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: 'success', callback: function(val) { 
+                            if (val == 'X'){
+                                $("#grilla").jqxGrid('updatebounddata');
+                            } 
                         }
                     });
-
-////////////////////////////////////////////////////////////////////////////////           
+                });
+            }
+        });
+////////////////////////////////////////////////////////////////////////////////            
         
     });
 </script>
