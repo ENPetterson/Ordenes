@@ -221,13 +221,24 @@ $timestamp = time();
             'width': 200,
             'removeCompleted': true,
             'onUploadComplete': function(file) {
+                $('#grilla').ajaxloader();
                 $.ajax({
                   method: "POST",
                   url: '/lebac/grabarExcel',
                   data: { file: file.name, cierre: $("#cierre").jqxDropDownList('getSelectedItem').value}
                 }).done(function( msg ) {
-                    new Messi('Se han importado las ordenes', {title: 'Confirmar',modal: true,
-                        buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: 'success', callback: function(val) { 
+                    var titleClass;
+                    var mensaje;
+                    if(msg == '"OK"'){
+                        titleClass = 'success';
+                        mensaje = 'Se han importado las ordenes';
+                    } else {
+                        titleClass = 'error';
+                        mensaje = 'No se han importado las ordenes';
+                    }
+                    $('#grilla').ajaxloader('hide');
+                    new Messi(mensaje, {title: 'Confirmar',modal: true,
+                        buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass, callback: function(val) { 
                             if (val == 'X'){
                                 $("#grilla").jqxGrid('updatebounddata');
                             } 
@@ -236,8 +247,7 @@ $timestamp = time();
                 });
             }
         });
-////////////////////////////////////////////////////////////////////////////////            
-        
+////////////////////////////////////////////////////////////////////////////////                  
     });
 </script>
 <div id="cierre"></div>

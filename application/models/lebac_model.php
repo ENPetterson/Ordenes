@@ -606,12 +606,24 @@ class Lebac_model extends CI_Model{
         }
 
         $sheetname = 'Hoja1';
+        
         $sheet = $objPHPExcel->getSheetByName($sheetname);
+        
         if($sheet){
+            for ($row = 1; $row < 2; $row++){
+                for($column = 0; $column < 11; $column++){
+                    $nombreHoja[] = $sheet->getCellByColumnAndRow($column,$row)->getFormattedValue();                                      
+                }
+            }
+            if($nombreHoja[0] == 'Número' && $nombreHoja[6] == 'Lebacs' && $nombreHoja[9] == 'Comisión' && $nombreHoja[10] == 'Plazo'){
+                $aprobado = 1;
+            }
+        }
+        
+        if($aprobado){
             $highestRow = $sheet->getHighestRow();
             
             for ($row = 2; $row < $highestRow; $row++){ 
-                
                 $numeroComitente = $sheet->getCellByColumnAndRow(0,$row)->getFormattedValue();
                 $numeroComitente = str_replace(',', '', $numeroComitente);                
                 $cantidad = $sheet->getCellByColumnAndRow(6,$row)->getOldCalculatedValue();
@@ -642,14 +654,14 @@ class Lebac_model extends CI_Model{
                 $orden->plazo = $plazo;
                 $orden->comision = $comision;
                 $orden->cantidad = $cantidad;
-
                 $orden->estado = $estadoorden;
                 $orden->fhmodificacion = R::isoDateTime();
                 $orden->usuario = $usuario;
                 $orden->cierre = $cierre;
 
-                $this->id = R::store($orden);               
-            }
+                $this->id = R::store($orden);    
+                
+            }           
             return 'OK';
         } else {
             print_r("No se pudo cargar");
@@ -728,15 +740,5 @@ class Model_Cierre extends RedBean_SimpleModel {
         $auditoria->anterior = json_encode($this->prev);
         $auditoria->actual = json_encode(array('operacion'=>'Registro Borrado'));
         R::store($auditoria);        
-    }
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
+    }    
 }
