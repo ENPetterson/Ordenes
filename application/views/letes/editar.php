@@ -7,12 +7,10 @@
     <div>
         <form id="form">
             <table>
-                <!-- Se fueron tramos y precio 
                 <tr>
                     <td style="padding-right: 10px; padding-bottom: 10px">Tramo:</td>
                     <td><div id="tramo"></div></td>
                 </tr>
-                -->
                 <tr>
                     <td style="padding-right:10px; padding-bottom: 10px">Numero Comitente: </td>
                     <td><div id="numComitente" ></div></td>
@@ -37,12 +35,10 @@
                     <td style="padding-right:10px; padding-bottom: 10px">Cantidad V/N (u$s): </td>
                     <td><div id="cantidad"></div></td>
                 </tr>
-                <!-- 
                 <tr id="filaPrecio">
                     <td style="padding-right:10px; padding-bottom: 10px">Precio: </td>
                     <td><div id="precio" ></div></td>
                 </tr>
-                -->
                 <tr>
                     <td style="padding-right: 10px; padding-bottom: 10px">Comitente:</td>
                     <td><input type="text" id="comitente" style="width: 250px"></td>
@@ -78,11 +74,11 @@
         var minimos = [];
         var minimo = 0;
         
-        //$("#filaPrecio").hide();
+        $("#filaPrecio").hide();
         
         $("#ventanaLetes").jqxWindow({showCollapseButton: false, height: 450, width: 470, theme: theme, resizable: false, keyboardCloseKey: -1});
         
-        //$("#tramo").jqxDropDownList({ width: '300px', height: '25px', source: ['No Competitiva', 'Competitiva'], theme: theme, selectedIndex: 0, disabled: false});
+        $("#tramo").jqxDropDownList({ width: '300px', height: '25px', source: ['No Competitiva', 'Competitiva'], theme: theme, selectedIndex: 0, disabled: false});
         $("#numComitente").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999});
         var monedas = [
             { value: '$', label: 'Peso'},
@@ -93,7 +89,7 @@
         $("#plazo").jqxDropDownList({ width: '110px', height: '25px', theme: theme, placeHolder: 'elija plazo'});
         $("#comision").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 1, groupSeparator: ' ', max: 99, theme: theme});
         $("#cantidad").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999, theme: theme});
-        //$("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 4, groupSeparator: ' ', max: 1000.00, theme: theme});
+        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 3, groupSeparator: ' ', max: 999.99, theme: theme});
         $("#comitente").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
         $("#tipoPersona").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
         $("#oficial").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
@@ -134,7 +130,7 @@
             }
         });
         
-        /*
+        
         $("#tramo").on('change', function(event){
             var args = event.args;
             if (args){
@@ -147,7 +143,7 @@
                 }
             }
         });
-        */
+        
         
         
         
@@ -185,7 +181,7 @@
                 
                 $("#comision").val(data.comision);
                 $("#cantidad").val(data.cantidad);
-                //$("#precio").val(data.precio);
+                $("#precio").val(data.precio);
                 $("#cable").jqxCheckBox('uncheck');
                 if(data.moneda == '$'){
                     $("#moneda").jqxDropDownList('selectIndex', 0);
@@ -196,7 +192,7 @@
                     }
                 }
                 plazoCargado = data.plazo;
-                //$("#tramo").val(data.tramo);
+                $("#tramo").val(data.tramo);
                 $("#numComitente").focus();
                 var datos = {cierreletes_id: cierre_id};
                 url = '/letes/getCierre';
@@ -235,7 +231,7 @@
                         minimo = 1000;
                     }
                     if ($("#tipoPersona").val() == 'JURIDICA'){
-                        minimo = 50001;
+                        minimo = 1000;
                     }
                     var cantidad = $("#cantidad").val();
                     $('#form').jqxValidator('hideHint', '#cantidad');
@@ -251,14 +247,14 @@
                     } else {
                         return true;
                     }
-                }} /*,
+                }}, 
                 { input: '#precio', message: 'El precio debe ser mayor que cero!', action: 'keyup, blur',  rule: function(){
                     if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#precio").val() == 0) {
                         return false;
                     } else {
                         return true;
                     }
-                }}*/
+                }}
             ], 
             theme: theme
         });
@@ -276,14 +272,14 @@
                 }
                 datos = {
                     id: $("#id").val(),
-                    //tramo: $("#tramo").val(),
+                    tramo: $("#tramo").val(),
                     numComitente: $("#numComitente").val(),
                     moneda: $("#moneda").val(),
                     cable: cable,
                     plazo: $("#plazo").val(),
                     comision: $("#comision").val(),
                     cantidad: $("#cantidad").val(),
-                    //precio: $("#precio").val(),
+                    precio: $("#precio").val(),
                     comitente: $("#comitente").val(),
                     tipoPersona: $("#tipoPersona").val(),
                     oficial: $("#oficial").val(),

@@ -51,7 +51,7 @@
         <td style="padding-top: 5em"><button class="btn" id="btnCupon">INVJ Cupones<div id="cierreCupon" class="texto-cierre"></div></button></td>
     </tr>
     <tr>
-        <td style="padding-top: 5em"><button class="btn" id="btnLetesPesos">Boncer 2023<div id="cierreLetesPesos" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnLetesPesos">Letes Pesos<div id="cierreLetesPesos" class="texto-cierre"></div></button></td>
         <td>&nbsp;</td>
     </tr>
     
