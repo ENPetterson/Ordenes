@@ -1,6 +1,14 @@
+<?php
+$timestamp = time();
+?>
+
 <script type="text/javascript">
     $(document).ready(function () {
             // prepare the data
+            
+        var timestamp = <?= $timestamp; ?>;
+        var token = '<?= md5('unique_salt' . $timestamp); ?>';    
+            
         var theme = getTheme();
         var id = 0;
         var enviar = [];
@@ -196,8 +204,50 @@
             }
         });
         
-        
-        
+////////////////////////////////////////////////////////////////////////////////   
+        $("#archivoExcel").jqxButton({ width: '300', theme: theme, disabled: false });
+
+        $('#archivoExcel').uploadifive({
+            'uploadScript': '/uploadifive.php',
+            'formData': {
+                'timestamp': timestamp,
+                'token': token
+            },
+            'buttonText': 'Importar Excel...',
+            'multi': false,
+            'queueSizeLimit': 1,
+            'uploadLimit': 0,
+            'height': 20,
+            'width': 200,
+            'removeCompleted': true,
+            'onUploadComplete': function(file) {
+                $('#grilla').ajaxloader();
+                $.ajax({
+                  method: "POST",
+                  url: '/lebac/grabarExcel',
+                  data: { file: file.name, cierre: $("#cierre").jqxDropDownList('getSelectedItem').value}
+                }).done(function( msg ) {
+                    var titleClass;
+                    var mensaje;
+                    if(msg == '"OK"'){
+                        titleClass = 'success';
+                        mensaje = 'Se han importado las ordenes';
+                    } else {
+                        titleClass = 'error';
+                        mensaje = 'No se han importado las ordenes';
+                    }
+                    $('#grilla').ajaxloader('hide');
+                    new Messi(mensaje, {title: 'Confirmar',modal: true,
+                        buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass, callback: function(val) { 
+                            if (val == 'X'){
+                                $("#grilla").jqxGrid('updatebounddata');
+                            } 
+                        }
+                    });
+                });
+            }
+        });
+////////////////////////////////////////////////////////////////////////////////                  
     });
 </script>
 <div id="cierre"></div>
@@ -210,6 +260,7 @@
             <td><input type="button" value="Editar" id="editarButton"></td>
             <td><input type="button" value="Borrar" id="borrarButton"></td>
             <td><input type="button" value="Enviar a Backoffice" id="enviarButton"></td>
+            <td id='archivoExcelFila'><input type="file" value="Archivo" id="archivoExcel"></td>
         </tr>
     </table>
 </div>

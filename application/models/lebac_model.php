@@ -1,5 +1,7 @@
 <?php
 
+require_once APPPATH."/third_party/PHPExcel.php";
+
 class Lebac_model extends CI_Model{
     public function __construct() {
         parent::__construct();
@@ -580,6 +582,101 @@ class Lebac_model extends CI_Model{
         
         return $resultado;
     }
+    
+    
+    public function grabarExcel(){
+                  
+        $usuarioParam = $this->session->userdata('usuario');
+ 
+        $orden = R::load('lebac', $this->id);
+        $cierre = R::load('cierre', $this->cierre);
+        $usuario = R::load('usuario', $usuarioParam['id']);
+        $estadoorden = R::load('estadoorden', 1);
+
+        $this->load->helper('file');
+        $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/tmp/';
+       
+        try {
+            $inputFileName = $uploadDir . $this->archivo;
+            $inputFileType = PHPExcel_IOFactory::identify($inputFileName);
+            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+            $objPHPExcel = $objReader->load($inputFileName);
+        } catch(Exception $e) {
+            die('Error loading file "'.pathinfo($inputFileName,PATHINFO_BASENAME).'": '.$e->getMessage());
+        }
+
+        $sheetname = 'Hoja1';
+        
+        $sheet = $objPHPExcel->getSheetByName($sheetname);
+        
+        if($sheet){
+            for ($row = 1; $row < 2; $row++){
+                for($column = 0; $column < 11; $column++){
+                    
+                    $nombreHoja = str_replace(
+                                            array('á','é','í','ó','ú'),
+                                            array('a','e','i','o','u'),
+                                            $sheet->getCellByColumnAndRow($column,$row)->getFormattedValue()
+                                        );
+                    
+                    
+                    $nombreHoja = strtolower($nombreHoja);                    
+                    $nombreHojas[] = $nombreHoja;                                    
+                }
+            }
+                        
+            if($nombreHojas[0] == 'numero' && $nombreHojas[6] == 'lebacs' && $nombreHojas[9] == 'comision' && $nombreHojas[10] == 'plazo'){
+                $aprobado = 1;
+            }
+        }
+        
+        if($aprobado){
+            $highestRow = $sheet->getHighestRow();
+            
+            for ($row = 2; $row < $highestRow; $row++){ 
+                $numeroComitente = $sheet->getCellByColumnAndRow(0,$row)->getFormattedValue();
+                $numeroComitente = str_replace(',', '', $numeroComitente);                
+                $cantidad = $sheet->getCellByColumnAndRow(6,$row)->getOldCalculatedValue();
+                $comision = $sheet->getCellByColumnAndRow(9,$row)->getFormattedValue();
+                $plazo = $sheet->getCellByColumnAndRow(10,$row)->getFormattedValue();
+
+                $orden = R::dispense('lebac');
+                $orden->tramo = 'No Competitiva';
+                $orden->numcomitente = $numeroComitente;
+
+                $this->load->model('Esco_model');
+                $this->Esco_model->numComitente = $numeroComitente;
+                $resultado = $this->Esco_model->getComitente();
+
+                if($resultado){
+                    $orden->comitente = $resultado['comitente']; // Lo levanto del Esco
+                    if ($resultado['esFisico'] == -1){
+                        $orden->tipopersona = 'FISICA';
+                    } else {
+                        $orden->tipopersona = 'JURIDICA'; 
+                    }
+                    $orden->oficial = $resultado['oficial'];
+                    $orden->cuit = $resultado['cuit'];    
+                } 
+
+                $orden->precio = 0;
+                $orden->moneda = '$';
+                $orden->plazo = $plazo;
+                $orden->comision = $comision;
+                $orden->cantidad = $cantidad;
+                $orden->estado = $estadoorden;
+                $orden->fhmodificacion = R::isoDateTime();
+                $orden->usuario = $usuario;
+                $orden->cierre = $cierre;
+
+                $this->id = R::store($orden);    
+                
+            }           
+            return 'OK';
+        } else {
+            print_r("No se pudo cargar");
+        }
+    }        
 }
 
 class Model_Lebac extends RedBean_SimpleModel {
@@ -615,7 +712,9 @@ class Model_Lebac extends RedBean_SimpleModel {
         $auditoria->anterior = json_encode($this->prev);
         $auditoria->actual = json_encode(array('operacion'=>'Registro Borrado'));
         R::store($auditoria);        
-    }    
+    } 
+        
+    
 }
 
 class Model_Cierre extends RedBean_SimpleModel {
@@ -651,5 +750,5 @@ class Model_Cierre extends RedBean_SimpleModel {
         $auditoria->anterior = json_encode($this->prev);
         $auditoria->actual = json_encode(array('operacion'=>'Registro Borrado'));
         R::store($auditoria);        
-    }
+    }    
 }

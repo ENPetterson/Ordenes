@@ -4,18 +4,18 @@ Copyright (c) 2012 Reactive Apps, Ronnie Garcia
 */
 
 .uploadifive-button {
-	background-color: #505050;
-	background-image: linear-gradient(bottom, #505050 0%, #707070 100%);
-	background-image: -o-linear-gradient(bottom, #505050 0%, #707070 100%);
-	background-image: -moz-linear-gradient(bottom, #505050 0%, #707070 100%);
-	background-image: -webkit-linear-gradient(bottom, #505050 0%, #707070 100%);
-	background-image: -ms-linear-gradient(bottom, #505050 0%, #707070 100%);
+	background-color: #3F94C5;
+	background-image: linear-gradient(bottom, #3F94C5 0%, #004A73 100%);
+	background-image: -o-linear-gradient(bottom, #3F94C5 0%, #004A73 100%);
+	background-image: -moz-linear-gradient(bottom, #3F94C5 0%, #004A73 100%);
+	background-image: -webkit-linear-gradient(bottom, #3F94C5 0%, #004A73 100%);
+	background-image: -ms-linear-gradient(bottom, #3F94C5 0%, #004A73 100%);
 	background-image: -webkit-gradient(
 		linear,
 		left bottom,
 		left top,
-		color-stop(0, #505050),
-		color-stop(1, #707070)
+		color-stop(0, #3F94C5),
+		color-stop(1, #004A73)
 	);
 	background-position: center top;
 	background-repeat: no-repeat;

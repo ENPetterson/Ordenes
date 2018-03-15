@@ -274,4 +274,13 @@ class Lebac extends MY_AuthController {
         echo json_encode($resultado);
     }
     
+    public function grabarExcel(){
+        $archivo = $this->input->post('file');
+        $cierre = $this->input->post('cierre');
+        $this->load->model('Lebac_model');
+        $this->Lebac_model->archivo = $archivo;
+        $this->Lebac_model->cierre = $cierre;
+        $resultado = $this->Lebac_model->grabarExcel();
+    }
+    
 }
