@@ -596,9 +596,6 @@ class Lebac_model extends CI_Model{
 
         $plazos = $this->Lebac_model->getPlazos();
                
-        R::freeze(true);
-        R::begin();
-        
         $this->load->helper('file');
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/tmp/';
        
@@ -637,78 +634,82 @@ class Lebac_model extends CI_Model{
         
         
         if($aprobado){
-            $highestRow = $sheet->getHighestRow();
+            $highestRow = $sheet->getHighestDataRow();
             
             $valido = true;
             $error = '';
+            
             R::freeze(false);
             R::begin();
             
             for ($row = 2; $row < $highestRow; $row++){
                 $numeroComitente = $sheet->getCellByColumnAndRow(0,$row)->getFormattedValue();
                 $numeroComitente = str_replace(',', '', $numeroComitente);                
-                $cantidad = $sheet->getCellByColumnAndRow(6,$row)->getOldCalculatedValue();
-                
-                $cantidad = (int)$cantidad;
-                
-                $comision = $sheet->getCellByColumnAndRow(9,$row)->getFormattedValue();
-                $plazo = $sheet->getCellByColumnAndRow(10,$row)->getFormattedValue();
-                
-                
-                
-                if (!in_array($plazo, $plazos)){
-                    $error.="Plazo invalido en fila {$row} <br>";
-                    $valido = false;
-                }
+                if (strlen(trim($numeroComitente)) > 0) { 
+                    $cantidad = $sheet->getCellByColumnAndRow(6,$row)->getCalculatedValue();
 
-                $orden = R::dispense('lebac');
-                $orden->tramo = 'No Competitiva';
-                $orden->numcomitente = $numeroComitente;
+                    $cantidad = (int)$cantidad;
 
-                $this->load->model('Esco_model');
-                $this->Esco_model->numComitente = $numeroComitente;
-                $resultado = $this->Esco_model->getComitente();
+                    $comision = $sheet->getCellByColumnAndRow(9,$row)->getFormattedValue();
+                    $plazo = $sheet->getCellByColumnAndRow(10,$row)->getFormattedValue();
 
-                if($resultado){
-                    $orden->comitente = $resultado['comitente']; // Lo levanto del Esco
-                    if ($resultado['esFisico'] == -1){
-                        $orden->tipopersona = 'FISICA';
-                    } else {
-                        $orden->tipopersona = 'JURIDICA'; 
+
+
+                    if (!in_array($plazo, $plazos)){
+                        $error.="Plazo invalido en fila {$row} <br>";
+                        $valido = false;
                     }
-                    $orden->oficial = $resultado['oficial'];
-                    $orden->cuit = $resultado['cuit'];    
-                } else {
-                    $error.="Número de comitente inválido en fila {$row} <br>";
-                    $valido = false;
-                }
-                
-                if(!is_numeric($comision)){
-                    $error.="Comisión inválida en fila {$row} <br>";
-                    $valido = false;
-                }
-                
-                
-                if(!is_int($cantidad)){
-                    $error.="Cantidad inválida en fila {$row} <br>";
-                    $valido = false;
-                }
-                
-                
 
-                $orden->precio = 0;
-                $orden->moneda = '$';
-                $orden->plazo = $plazo;
-                $orden->comision = $comision;
-                $orden->cantidad = $cantidad;
-                $orden->estado = $estadoorden;
-                $orden->fhmodificacion = R::isoDateTime();
-                $orden->usuario = $usuario;
-                $orden->cierre = $cierre;
+                    $orden = R::dispense('lebac');
+                    $orden->tramo = 'No Competitiva';
+                    $orden->numcomitente = $numeroComitente;
 
-                $this->id = R::store($orden);    
+                    $this->load->model('Esco_model');
+                    $this->Esco_model->numComitente = $numeroComitente;
+                    $resultado = $this->Esco_model->getComitente();
 
-                
+                    if($resultado){
+                        $orden->comitente = $resultado['comitente']; // Lo levanto del Esco
+                        if ($resultado['esFisico'] == -1){
+                            $orden->tipopersona = 'FISICA';
+                        } else {
+                            $orden->tipopersona = 'JURIDICA'; 
+                        }
+                        $orden->oficial = $resultado['oficial'];
+                        $orden->cuit = $resultado['cuit'];    
+                    } else {
+                        $error.="Número de comitente inválido en fila {$row} <br>";
+                        $valido = false;
+                    }
+
+                    if(!is_numeric($comision)){
+                        $error.="Comisión inválida en fila {$row} <br>";
+                        $valido = false;
+                    }
+
+
+                    if(!is_int($cantidad)){
+                        $error.="Cantidad inválida en fila {$row} <br>";
+                        $valido = false;
+                    }
+
+
+
+                    $orden->precio = 0;
+                    $orden->moneda = '$';
+                    $orden->plazo = $plazo;
+                    $orden->comision = $comision;
+                    $orden->cantidad = $cantidad;
+                    $orden->estado = $estadoorden;
+                    $orden->fhmodificacion = R::isoDateTime();
+                    $orden->usuario = $usuario;
+                    $orden->cierre = $cierre;
+
+                    if ($valido){
+                        $this->id = R::store($orden);    
+                    }
+
+                }
                 
             }           
             
