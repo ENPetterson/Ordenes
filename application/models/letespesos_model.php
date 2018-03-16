@@ -353,7 +353,7 @@ class LetesPesos_model extends CI_Model{
         $colocacionAnterior = 0;
         $contenidoInd = 0;
         foreach ($resultado as $indice=>$fila){
-            $plazo = R::findOne('plazoletespesos', 'cierreletespeos_id = ? and moneda = ? and plazo = ?', array($fila['cierreletespesos_id'], $fila['moneda'], $fila['plazo']));
+            $plazo = R::findOne('plazoletespesos', 'cierreletespesos_id = ? and moneda = ? and plazo = ?', array($fila['cierreletespesos_id'], $fila['moneda'], $fila['plazo']));
             if ($fila['tramo'] == 'Competitiva'){
                 $titulo = $plazo->tituloC;
                 $precio = $fila['precio'];

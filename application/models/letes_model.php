@@ -6,14 +6,14 @@ class Letes_model extends CI_Model{
     }
     
     public $id;
-    //public $tramo;
+    public $tramo;
     public $numComitente;
     public $moneda;
     public $cable;
     public $plazo;
     public $comision;
     public $cantidad;
-    //public $precio;
+    public $precio;
     public $comitente;
     public $tipoPersona;
     public $oficial;
@@ -54,14 +54,14 @@ class Letes_model extends CI_Model{
             $orden->usuario = $usuario;
             $orden->estado = $estadoorden;
         }
-        //$orden->tramo = $this->tramo;
+        $orden->tramo = $this->tramo;
         $orden->numcomitente = $this->numComitente;
         $orden->moneda = $this->moneda;
         $orden->cable = $this->cable;
         $orden->plazo = $this->plazo;
         $orden->comision = $this->comision;
         $orden->cantidad = $this->cantidad;
-        //$orden->precio = $this->precio;
+        $orden->precio = $this->precio;
         $orden->comitente = $this->comitente;
         $orden->tipopersona = $this->tipoPersona;
         $orden->oficial = $this->oficial;
@@ -254,6 +254,7 @@ class Letes_model extends CI_Model{
             
             $cierre = R::load('cierreletes', $fila['cierreletes_id']);
             
+            
             $tramo = 'Tramo General';
             if ($fila['tipopersona'] == 'FISICA'){
                 $tipoPersona = "Persona Fisica";
@@ -272,9 +273,19 @@ class Letes_model extends CI_Model{
                 $integracion = ' - Integracion Dolares';
             }
             
+            if ($fila['tramo'] == 'Competitiva') {
+                $tramo = 'Tramo Competitivo';
+                $precio = $fila['precio'];
+            } else {
+                $tramo = 'Tramo NO Competitivo';
+                $precio = '';
+            }
             
             
-            $titulo = $tramo . ' U$S ' . $fila['plazo'] . ' dias' . $integracion;
+            
+            
+            //$titulo = $tramo . ' U$S ' . $fila['plazo'] . ' dias' . $integracion;
+            $titulo = 'Letras de ' . $fila['plazo'] . ' dias ' . $tramo . $integracion;
             
             if ($indice == 0){
                 $colocacionAnterior = $colocacion;
@@ -289,7 +300,7 @@ class Letes_model extends CI_Model{
             //$contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t\t" . $fila['cantidad'] . "\t\t" . $this->formatearCuit($fila['cuit']) . "\t" . $fila['numcomitente'] . "\r\n";
             //Oferta;Colocación;Colocador;Título;Fecha Liq.;Agente;De Terceros;Tipo;Valor;%/$;Cantidad;Moneda;Porc. Inv.;Estado;Fecha Ing.;Observaciones;Cliente/Comitente;CUIT;Nombre;Nacionalidad;Categoria;Tipo Persona
 
-            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t\t" . $fila['cuit'] . "\t\t\t\t" . $tipoPersona .  "\r\n";
+            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t\t" . $fila['cuit'] . "\t\t\t\t" . $tipoPersona .  "\r\n";
             
         }
         

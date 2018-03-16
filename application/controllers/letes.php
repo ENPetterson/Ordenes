@@ -24,14 +24,14 @@ class Letes extends MY_AuthController {
     public function saveOrden(){
         $this->load->model('Letes_model');
         $this->Letes_model->id = $this->input->post('id');
-        //$this->Letes_model->tramo = $this->input->post('tramo');
+        $this->Letes_model->tramo = $this->input->post('tramo');
         $this->Letes_model->numComitente = $this->input->post('numComitente');
         $this->Letes_model->moneda = $this->input->post('moneda');
         $this->Letes_model->cable = $this->input->post('cable');
         $this->Letes_model->plazo = $this->input->post('plazo');
         $this->Letes_model->comision = $this->input->post('comision');
         $this->Letes_model->cantidad = $this->input->post('cantidad');
-        //$this->Letes_model->precio = $this->input->post('precio');
+        $this->Letes_model->precio = $this->input->post('precio');
         $this->Letes_model->comitente = $this->input->post('comitente');
         $this->Letes_model->tipoPersona = $this->input->post('tipoPersona');
         $this->Letes_model->oficial = $this->input->post('oficial');
