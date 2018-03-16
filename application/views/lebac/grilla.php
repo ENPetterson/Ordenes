@@ -222,32 +222,31 @@ $timestamp = time();
             'removeCompleted': true,
             'onUploadComplete': function(file) {
                 $('#grilla').ajaxloader();
-                $.ajax({
-                  method: "POST",
-                  url: '/lebac/grabarExcel',
-                  data: { file: file.name, cierre: $("#cierre").jqxDropDownList('getSelectedItem').value}
-                }).done(function( msg ) {
+                $.post('/lebac/grabarExcel', { file: file.name, cierre: $("#cierre").jqxDropDownList('getSelectedItem').value}, function(msg){
                     var titleClass;
                     var mensaje;
-                    if(msg == '"OK"'){
+                    var title;
+                    if(msg.resultado == 'OK'){
                         titleClass = 'success';
+                        title = 'Correcto';
                         mensaje = 'Se han importado las ordenes';
                     } else {
                         titleClass = 'error';
-                        mensaje = 'No se han importado las ordenes';
+                        title = 'No se importaron las ordenes';
+                        mensaje = msg.mensaje;
                     }
                     $('#grilla').ajaxloader('hide');
-                    new Messi(mensaje, {title: 'Confirmar',modal: true,
+                    new Messi(mensaje, {title: title, modal: true,
                         buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass, callback: function(val) { 
                             if (val == 'X'){
                                 $("#grilla").jqxGrid('updatebounddata');
                             } 
                         }
-                    });
-                });
+                    });                    
+                }, 'json');
             }
         });
-////////////////////////////////////////////////////////////////////////////////                  
+////////////////////////////////////////////////////////////////////////////////                   
     });
 </script>
 <div id="cierre"></div>

@@ -591,8 +591,14 @@ class Lebac_model extends CI_Model{
         $orden = R::load('lebac', $this->id);
         $cierre = R::load('cierre', $this->cierre);
         $usuario = R::load('usuario', $usuarioParam['id']);
-        $estadoorden = R::load('estadoorden', 1);
+        $estadoorden = R::load('estadoorden', 1);        
+        $this->moneda = '$';
 
+        $plazos = $this->Lebac_model->getPlazos();
+               
+        R::freeze(true);
+        R::begin();
+        
         $this->load->helper('file');
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/tmp/';
        
@@ -619,7 +625,6 @@ class Lebac_model extends CI_Model{
                                             $sheet->getCellByColumnAndRow($column,$row)->getFormattedValue()
                                         );
                     
-                    
                     $nombreHoja = strtolower($nombreHoja);                    
                     $nombreHojas[] = $nombreHoja;                                    
                 }
@@ -630,15 +635,31 @@ class Lebac_model extends CI_Model{
             }
         }
         
+        
         if($aprobado){
             $highestRow = $sheet->getHighestRow();
             
-            for ($row = 2; $row < $highestRow; $row++){ 
+            $valido = true;
+            $error = '';
+            R::freeze(false);
+            R::begin();
+            
+            for ($row = 2; $row < $highestRow; $row++){
                 $numeroComitente = $sheet->getCellByColumnAndRow(0,$row)->getFormattedValue();
                 $numeroComitente = str_replace(',', '', $numeroComitente);                
                 $cantidad = $sheet->getCellByColumnAndRow(6,$row)->getOldCalculatedValue();
+                
+                $cantidad = (int)$cantidad;
+                
                 $comision = $sheet->getCellByColumnAndRow(9,$row)->getFormattedValue();
                 $plazo = $sheet->getCellByColumnAndRow(10,$row)->getFormattedValue();
+                
+                
+                
+                if (!in_array($plazo, $plazos)){
+                    $error.="Plazo invalido en fila {$row} <br>";
+                    $valido = false;
+                }
 
                 $orden = R::dispense('lebac');
                 $orden->tramo = 'No Competitiva';
@@ -657,7 +678,23 @@ class Lebac_model extends CI_Model{
                     }
                     $orden->oficial = $resultado['oficial'];
                     $orden->cuit = $resultado['cuit'];    
-                } 
+                } else {
+                    $error.="Número de comitente inválido en fila {$row} <br>";
+                    $valido = false;
+                }
+                
+                if(!is_numeric($comision)){
+                    $error.="Comisión inválida en fila {$row} <br>";
+                    $valido = false;
+                }
+                
+                
+                if(!is_int($cantidad)){
+                    $error.="Cantidad inválida en fila {$row} <br>";
+                    $valido = false;
+                }
+                
+                
 
                 $orden->precio = 0;
                 $orden->moneda = '$';
@@ -670,10 +707,26 @@ class Lebac_model extends CI_Model{
                 $orden->cierre = $cierre;
 
                 $this->id = R::store($orden);    
+
+                
                 
             }           
-            return 'OK';
+            
+            if ($valido){
+                R::commit();
+                $resultado = array('resultado'=>'OK');
+            } else {
+                R::rollback();
+                $resultado = array('resultado'=>'Error', 'mensaje'=>$error);
+            }
+            
+            R::freeze(false); 
+
+            return $resultado;
+            
         } else {
+
+            
             print_r("No se pudo cargar");
         }
     }        
