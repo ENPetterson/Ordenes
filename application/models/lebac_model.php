@@ -642,7 +642,7 @@ class Lebac_model extends CI_Model{
             R::freeze(false);
             R::begin();
             
-            for ($row = 2; $row < $highestRow; $row++){
+            for ($row = 2; $row <= $highestRow; $row++){
                 $numeroComitente = $sheet->getCellByColumnAndRow(0,$row)->getFormattedValue();
                 $numeroComitente = str_replace(',', '', $numeroComitente);                
                 if (strlen(trim($numeroComitente)) > 0) { 
