@@ -460,7 +460,7 @@ class Lebac_model extends CI_Model{
             $ahora = new DateTime();
             $diferencia = $fechaCierre->diff($ahora);
             $minutos = $diferencia->d * 24 *60 + $diferencia->h * 60 + $diferencia->i;
-            if ($minutos <= 10){
+            if ($minutos <= 20){
                 $this->load->library('email');
                 $sql = "select  *
                         from    usuario
