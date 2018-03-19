@@ -646,8 +646,11 @@ class Lebac_model extends CI_Model{
                 $numeroComitente = $sheet->getCellByColumnAndRow(0,$row)->getFormattedValue();
                 $numeroComitente = str_replace(',', '', $numeroComitente);                
                 if (strlen(trim($numeroComitente)) > 0) { 
-                    $cantidad = $sheet->getCellByColumnAndRow(6,$row)->getCalculatedValue();
-
+                    
+                    $cantidad = $sheet->getCellByColumnAndRow(6,$row)->getOldCalculatedValue();     
+                    if($cantidad == 0){
+                      $cantidad = $sheet->getCellByColumnAndRow(6,$row)->getCalculatedValue();
+                    }
                     $cantidad = (int)$cantidad;
 
                     $comision = $sheet->getCellByColumnAndRow(9,$row)->getFormattedValue();
@@ -712,7 +715,7 @@ class Lebac_model extends CI_Model{
                 }
                 
             }           
-            
+                        
             if ($valido){
                 R::commit();
                 $resultado = array('resultado'=>'OK');
@@ -726,9 +729,10 @@ class Lebac_model extends CI_Model{
             return $resultado;
             
         } else {
-
             
-            print_r("No se pudo cargar");
+            $error = 'Títulos inválidos.';
+            $resultado = array('resultado'=>'Error', 'mensaje'=>$error);
+            return $resultado;
         }
     }        
 }
