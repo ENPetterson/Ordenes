@@ -639,7 +639,7 @@ class Lebac_model extends CI_Model{
             $valido = true;
             $error = '';
             
-            R::freeze(false);
+            R::freeze(true);
             R::begin();
             
             for ($row = 2; $row <= $highestRow; $row++){
@@ -696,6 +696,11 @@ class Lebac_model extends CI_Model{
                         $valido = false;
                     }
 
+                    $numero=1000;
+                    if(!($cantidad%$numero==0)){
+                        $error.="Cantidad no es múltiplo de 1000 en fila {$row} <br>";
+                        $valido = false;
+                    }
 
 
                     $orden->precio = 0;
