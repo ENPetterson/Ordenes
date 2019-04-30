@@ -344,15 +344,55 @@ class Bono_model extends CI_Model{
         $contenidoInd = 0;
         foreach ($resultado as $indice=>$fila){
             $plazo = R::findOne('plazobono', 'cierrebono_id = ? and moneda = ?', array($fila['cierrebono_id'], $fila['moneda']));
-            if ($fila['tramo'] == 'Competitiva'){
-                $titulo = $plazo->tituloC;
-                $precio = $fila['precio'];
-                $colocacion = $plazo->colocacionC;
-            } else {
-                $precio = '';
-                $titulo = $plazo->tituloNC;
-                $colocacion = $plazo->colocacionNC;
-            }
+            
+            
+            //Esto se cambia.
+            
+//            if ($fila['tramo'] == 'Competitiva'){
+//                $titulo = $plazo->tituloC;
+//                $precio = $fila['precio'];
+//                $colocacion = $plazo->colocacionC;
+//            } else {
+//                $precio = '';
+//                $titulo = $plazo->tituloNC;
+//                $colocacion = $plazo->colocacionNC;
+//            }
+            
+//            switch ($fila['plazo']){
+//		case '183':
+		    switch ($fila['moneda']){
+		        case '$':
+		            if ($fila['tramo'] == 'Competitiva'){
+		                $titulo = utf8_decode('Boncer en $ Vto. 2021 Tramo Competitivo - Int Pesos');
+		                $precio = $fila['precio'];
+		            } else {
+		                $titulo = utf8_decode('Boncer en $ Vto. 2021 Tramo NO Competitivo - Int Pesos');
+		                $precio = '';
+		            }
+		            break;
+
+		        case 'u$s':
+		            if ($fila['tramo'] == 'Competitiva'){
+		                $titulo = utf8_decode('Boncer en $ Vto. 2021 Tramo Competitivo - Int Dolares');
+		                $precio = $fila['precio'];
+		            } else {
+		                $titulo = utf8_decode('Boncer en $ Vto. 2021 Tramo NO Competitivo - Int Dolares');
+		                $precio = '';
+		            }
+		            break;
+	    	    }
+//                break;
+//            }
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             
             if ($indice == 0){
                 $colocacionAnterior = $colocacion;
@@ -411,7 +451,7 @@ class Bono_model extends CI_Model{
         }
         $this->load->library('zip');
         foreach ($contenido as $data){
-            $archivo = date('Y-m-d-H-i-s') . '-' . $data['colocacion'] . '-byma.dat';
+            $archivo = date('Y-m-d-H-i-s') . '-' . $data['colocacion'] . '-byma.txt';
             //$archivo = date('Y-m-d-H-i-s') . '-' . $data['colocacion'] . '-bonos.txt';
             $this->zip->add_data($archivo, $data['datos']);
             //file_put_contents($archivo, $data['datos']);

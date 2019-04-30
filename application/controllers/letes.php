@@ -118,6 +118,11 @@ class Letes extends MY_AuthController {
         $this->Letes_model->minimos = $minimos;
         $this->Letes_model->colocacionPesos = $this->input->post('colocacionPesos');
         $this->Letes_model->colocacionDolares = $this->input->post('colocacionDolares');
+        /*
+        $this->Letes_model->colocacionLebacsNov = $this->input->post('colocacionLebacsNov');
+        $this->Letes_model->colocacionLebacsDic = $this->input->post('colocacionLebacsDic');
+         * 
+         */
         $cierre = $this->Letes_model->saveCierre();
         echo json_encode($cierre);
     }

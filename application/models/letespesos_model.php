@@ -349,11 +349,12 @@ class LetesPesos_model extends CI_Model{
                 ORDER BY cierreletespesos_id, moneda, plazo ";
         $resultado = R::getAll($sql);
         
-        $contenido = "";
+        //$contenido = "";
         $colocacionAnterior = 0;
         $contenidoInd = 0;
         foreach ($resultado as $indice=>$fila){
-            $plazo = R::findOne('plazoletespesos', 'cierreletespesos_id = ? and moneda = ? and plazo = ?', array($fila['cierreletespesos_id'], $fila['moneda'], $fila['plazo']));
+            $plazo = R::findOne('plazoletespesos', 'cierreletespesos_id = ? and moneda = ? and plazo = ?', array($fila['cierreletespesos_id'], $fila['moneda'], $fila['plazo']));            
+            /*
             if ($fila['tramo'] == 'Competitiva'){
                 $titulo = $plazo->tituloC;
                 $precio = $fila['precio'];
@@ -365,6 +366,37 @@ class LetesPesos_model extends CI_Model{
                     $titulo = $plazo->tituloNCF;
                 }
             }
+            */
+            switch ($fila['moneda']){
+                case '$':
+                    if ($fila['tramo'] == 'Competitiva'){
+                        $titulo = utf8_decode('LECAPs a 80 dias en Pesos Vto 19/07/2019  - Int Pesos - Tramo Competitivo');
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode('LECAPs a 80 dias en Pesos Vto 19/07/2019  - Int Pesos - Tramo NO Competitivo');
+                        $precio = '';
+                    }
+                    break;
+
+                case 'u$s':
+                    if ($fila['tramo'] == 'Competitiva'){
+                        $titulo = utf8_decode('LECAPs a 80 dias en Pesos Vto 19/07/2019  - Int Dolares - Tramo Competitivo');
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode('LECAPs a 80 dias en Pesos Vto 19/07/2019  - Int Dolares - Tramo NO Competitivo');
+                        $precio = '';
+                    }
+                    break;
+            }
+            
+            if ($fila['tipopersona'] == 'FISICA'){
+                $tipoPersona = 'Persona Fisica';
+            } else {
+                $tipoPersona = 'Persona Juridica';
+            }
+            
+            
+            
             
             $colocacion = $plazo->colocacion;
             if ($indice == 0){
@@ -379,7 +411,7 @@ class LetesPesos_model extends CI_Model{
             
             
             $contenido[$contenidoInd]['colocacion'] = $colocacion;
-            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t\t" . $fila['cuit']  .  "\r\n";
+            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t\t" . $fila['cuit']  . "\t\t\t\t" . $tipoPersona .  "\t\t\tCUIT\r\n";
             
         }
         $this->load->library('zip');

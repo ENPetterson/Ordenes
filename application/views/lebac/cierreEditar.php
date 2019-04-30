@@ -185,16 +185,16 @@
                 var rowcount = rows.length;
                 return (rowcount > 0);
             }},
-            { input: '#instrumentoLebac', message: 'No existe un instrumento con ese nombre!',  rule: function(){
-                var resultado;
-                jQuery.ajaxSetup({async:false});
-                $.post('/esco/existeInstrumento', {instrumento: $('#instrumentoLebac').val()}, function(data){
-                    resultado = data.existe;
-                }
-                , 'json');
-                jQuery.ajaxSetup({async:true});
-                return resultado;
-            }}
+//            { input: '#instrumentoLebac', message: 'No existe un instrumento con ese nombre!',  rule: function(){
+//                var resultado;
+//                jQuery.ajaxSetup({async:false});
+//                $.post('/esco/existeInstrumento', {instrumento: $('#instrumentoLebac').val()}, function(data){
+//                    resultado = data.existe;
+//                }
+//                , 'json');
+//                jQuery.ajaxSetup({async:true});
+//                return resultado;
+//            }}
             ], 
             theme: theme
         });

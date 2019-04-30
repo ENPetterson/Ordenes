@@ -43,15 +43,15 @@
 </style>
 <table id="botonera">
     <tr>
-        <td><button class="btn" id="btnLebacs">Lebacs<div id="cierreLebacs" class="texto-cierre"></div></button></td>
+        <td><button class="btn" id="btnLebacs">Lecer<div id="cierreLebacs" class="texto-cierre"></div></button></td>
         <td><button class="btn" id="btnLetes">Letes<div id="cierreLetes" class="texto-cierre"></div></button></td>
     </tr>
     <tr>
-        <td style="padding-top: 5em"><button class="btn" id="btnBono">Bono 2020<div id="cierreBono" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnBono">BONCER 2021<div id="cierreBono" class="texto-cierre"></div></button></td>
         <td style="padding-top: 5em"><button class="btn" id="btnCupon">INVJ Cupones<div id="cierreCupon" class="texto-cierre"></div></button></td>
     </tr>
     <tr>
-        <td style="padding-top: 5em"><button class="btn" id="btnLetesPesos">Letes Pesos<div id="cierreLetesPesos" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnLetesPesos">Lecap<div id="cierreLetesPesos" class="texto-cierre"></div></button></td>
         <td>&nbsp;</td>
     </tr>
     

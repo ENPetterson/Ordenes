@@ -36,7 +36,7 @@
                     <td><div id="cantidad"></div></td>
                 </tr>
                 <tr id="filaPrecio">
-                    <td style="padding-right:10px; padding-bottom: 10px">Precio: </td>
+                    <td style="padding-right:10px; padding-bottom: 10px">Precio (c/1000): </td>
                     <td><div id="precio" ></div></td>
                 </tr>
                 <tr>
@@ -81,15 +81,20 @@
         $("#tramo").jqxDropDownList({ width: '300px', height: '25px', source: ['No Competitiva', 'Competitiva'], theme: theme, selectedIndex: 0, disabled: false});
         $("#numComitente").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999});
         var monedas = [
-            { value: '$', label: 'Peso'},
+            /* { value: '$', label: 'Peso'}, */
             { value: 'u$s', label: 'Dolar'}
+            /*
+            ,
+            { value: 'LN', label: 'Lebacs Nov'},
+            { value: 'LD', label: 'Lebacs Dic'}
+            */
         ];
         $("#moneda").jqxDropDownList({ width: '300px', height: '25px', source: monedas, theme: theme, placeHolder: 'elija la moneda'});
         $("#cable").jqxCheckBox({height: '20px', theme: theme});
         $("#plazo").jqxDropDownList({ width: '110px', height: '25px', theme: theme, placeHolder: 'elija plazo'});
         $("#comision").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 1, groupSeparator: ' ', max: 99, theme: theme});
         $("#cantidad").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999, theme: theme});
-        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 3, groupSeparator: ' ', max: 999.99, theme: theme});
+        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 4, groupSeparator: ' ', max: 9999.99, theme: theme});
         $("#comitente").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
         $("#tipoPersona").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
         $("#oficial").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
@@ -121,7 +126,7 @@
         $("#moneda").on('change', function(event){
             var args = event.args;
             if (args){
-                if (args.item.value == '$'){
+                if (args.item.value != 'u$s'){
                     $("#filaCable").hide();
                     $("#cable").jqxCheckBox('uncheck');
                 } else {
@@ -130,6 +135,16 @@
             }
         });
         
+        $('#cantidad').on('valueChanged', function (event) {
+            var value = $("#cantidad").val();
+            if (value > 50000){
+                $("#tramo").jqxDropDownList({selectedIndex: 1 });
+                $("#tramo").jqxDropDownList({ disabled: true }); 
+            } else {
+                $("#tramo").jqxDropDownList({ disabled: false }); 
+            }
+        });
+
         
         $("#tramo").on('change', function(event){
             var args = event.args;
@@ -183,14 +198,24 @@
                 $("#cantidad").val(data.cantidad);
                 $("#precio").val(data.precio);
                 $("#cable").jqxCheckBox('uncheck');
-                if(data.moneda == '$'){
-                    $("#moneda").jqxDropDownList('selectIndex', 0);
-                } else {
-                    $("#moneda").jqxDropDownList('selectIndex', 1);
-                    if (data.cable == 1){
-                        $("#cable").jqxCheckBox('check');
-                    }
+                switch( (data.moneda)){
+                    case '$':
+                        $("#moneda").jqxDropDownList('selectIndex', 0);
+                        break;
+                    case 'u$s':
+                        $("#moneda").jqxDropDownList('selectIndex', 1);
+                        if (data.cable == 1){
+                            $("#cable").jqxCheckBox('check');
+                        }
+                        break;
+                    case 'LN':
+                        $("#moneda").jqxDropDownList('selectIndex', 2);
+                        break;
+                    case 'LD':
+                        $("#moneda").jqxDropDownList('selectIndex', 0);
+                        break;                        
                 }
+                
                 plazoCargado = data.plazo;
                 $("#tramo").val(data.tramo);
                 $("#numComitente").focus();
@@ -230,11 +255,25 @@
                     if (minimo == 0){
                         minimo = 1000;
                     }
+                    var maximo = 0;
+                    
+                    if ($("#tramo").jqxDropDownList('getSelectedIndex') == 0){
+                        maximo = 2000001;
+                    } else {
+                        maximo = 0;
+                    }
+                    
                     if ($("#tipoPersona").val() == 'JURIDICA'){
-                        minimo = 1000;
+                        //minimo = 10000;
                     }
                     var cantidad = $("#cantidad").val();
                     $('#form').jqxValidator('hideHint', '#cantidad');
+                    
+                    if (maximo > 0 && cantidad > maximo){
+                        $('#form').jqxValidator('rules')[3].message = "La cantidad no puede ser mayor que " + maximo.toString() + "!";
+                        result = false;
+                    }
+                    
                     if (cantidad < minimo){
                         $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser mayor o igual que " + minimo.toString() + " !";
                         result = false;
@@ -254,7 +293,14 @@
                     } else {
                         return true;
                     }
-                }}
+                }},
+                { input: '#precio', message: 'El precio debe ser menor o igual a 971,13!', action: 'keyup, blur',  rule: function(){
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#precio").val() > (97113/100)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }}            
             ], 
             theme: theme
         });

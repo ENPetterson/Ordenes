@@ -326,8 +326,8 @@
                 { input: '#plazo', message: 'El plazo debe ser mayor a 27!',  rule: function(){
                     return $("#plazo").val() > 27;
                 } },
-                { input: '#plazo', message: 'El plazo debe ser menor a 365!',  rule: function(){
-                    return $("#plazo").val() < 365;
+                { input: '#plazo', message: 'El plazo debe ser menor a 999!',  rule: function(){
+                    return $("#plazo").val() < 999;
                 } },            
                 { input: '#especie', message: 'Debe ingresar el nombre de la especie!',  rule: 'required' },
                 { input: '#colocacion', message: 'Debe ingresar el numero de colocación!',  rule: function(){

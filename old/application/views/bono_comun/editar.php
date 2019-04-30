@@ -1,0 +1,346 @@
+<input type="hidden" id="id" value="<?php echo $id;?>" >
+<input type="hidden" id="origen" value="<?php echo $origen;?>" >
+<div id="ventanaBono">
+    <div id="titulo">
+        Editar Orden Bono
+    </div>
+    <div>
+        <form id="form">
+            <table>
+                <tr>
+                    <td style="padding-right: 10px; padding-bottom: 10px">Tramo:</td>
+                    <td><div id="tramo"></div></td>
+                </tr>
+                <tr>
+                    <td style="padding-right:10px; padding-bottom: 10px">Numero Comitente: </td>
+                    <td><div id="numComitente" ></div></td>
+                </tr>
+                <tr>
+                    <td style="padding-right: 10px; padding-bottom: 10px">Moneda:</td>
+                    <td><div id="moneda"></div></td>
+                </tr>
+                <!--
+                <tr id="filaCable">
+                    <td style="padding-right: 10px; padding-bottom: 10px">Es Dolar Cable:</td>
+                    <td><div id="cable"></div></td>
+                </tr>                
+                <tr>
+                    <td style="padding-right:10px; padding-bottom: 10px">Plazo Días: </td>
+                    <td><div id="plazo"></div></td>
+                </tr>
+                -->
+                <tr>
+                    <td style="padding-right:10px; padding-bottom: 10px">Comisión %: </td>
+                    <td><div id="comision"></div></td>
+                </tr>
+                <tr>
+                    <td style="padding-right:10px; padding-bottom: 10px">Cantidad: </td>
+                    <td><div id="cantidad"></div></td>
+                </tr>
+                <tr id="filaPrecio">
+                    <td style="padding-right:10px; padding-bottom: 10px">Precio: </td>
+                    <td><div id="precio" ></div></td>
+                </tr>
+                <tr>
+                    <td style="padding-right: 10px; padding-bottom: 10px">Comitente:</td>
+                    <td><input type="text" id="comitente" style="width: 250px"></td>
+                </tr>
+                <tr>
+                    <td style="padding-right: 10px; padding-bottom: 10px">Tipo Persona:</td>
+                    <td><input type="text" id="tipoPersona" style="width: 250px"></td>
+                </tr>
+                <tr>
+                    <td style="padding-right: 10px; padding-bottom: 10px">Oficial:</td>
+                    <td><input type="text" id="oficial" style="width: 250px"></td>
+                </tr>
+                <tr>
+                    <td style="padding-right: 10px; padding-bottom: 25px">CUIT:</td>
+                    <td><input type="text" id="cuit" style="width: 250px"></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center">
+                        <input type="button" id="aceptarButton" value="Aceptar">
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div> 
+</div>
+<script>
+    $(function(){
+        var theme = getTheme();
+        var formOK = false;
+        var comitente = false;
+        //var plazoCargado = 0;
+        var cierre_id = 0;
+        
+        $("#filaPrecio").hide();
+        
+        $("#ventanaBono").jqxWindow({showCollapseButton: false, height: 500, width: 470, theme: theme, resizable: false, keyboardCloseKey: -1});
+        
+        $("#tramo").jqxDropDownList({ width: '300px', height: '25px', source: ['No Competitiva', 'Competitiva'], theme: theme, selectedIndex: 0, disabled: false});
+        $("#numComitente").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999});
+        var srcMonedas = {
+            datatype: 'json',
+            datafields: [
+                {name: 'simbolo'},
+                {name: 'nombre'}
+            ],
+            data: {cierrebono_id: cierre_id},
+            type: 'POST',
+            id: 'simbolo',
+            url: '/bono/getMonedas'
+        }
+        var DAMonedas = new $.jqx.dataAdapter(srcMonedas);
+        $("#moneda").jqxDropDownList({ width: '300px', height: '25px', source: DAMonedas, theme: theme, placeHolder: 'elija la moneda', displayMember: 'nombre', valueMember: 'simbolo'});
+        //$("#cable").jqxCheckBox({height: '20px', theme: theme});
+        //$("#plazo").jqxDropDownList({ width: '110px', height: '25px', theme: theme, placeHolder: 'elija plazo'});
+        $("#comision").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 1, groupSeparator: ' ', max: 99, theme: theme});
+        $("#cantidad").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999, theme: theme});
+        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 3, digits: 7, groupSeparator: ' ', max: 999999999.9, theme: theme});
+        $("#comitente").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
+        $("#tipoPersona").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
+        $("#oficial").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
+        $("#cuit").jqxInput({ width: '110px', height: '25px', disabled: true, theme: theme});
+        
+        $('#numComitente').on('valueChanged', function (event) {
+            var value = $("#numComitente").val();
+            $.post('/esco/getComitente', {numComitente: value}, function(pComitente){
+                comitente = pComitente;
+                if (pComitente){
+                    $("#comitente").val(pComitente.comitente);
+                    if (pComitente.esFisico == -1){
+                        $("#tipoPersona").val('FISICA'); 
+                    } else {
+                        $("#tipoPersona").val('JURIDICA'); 
+                    }
+                    $("#oficial").val(pComitente.oficial);
+                    $("#cuit").val(pComitente.cuit);
+                    $('#form').jqxValidator('hideHint', '#numComitente');
+                } else {
+                    $("#comitente").val('');
+                    $("#tipoPersona").val(''); 
+                    $("#oficial").val('');
+                    $("#cuit").val('');
+                }
+            }, 'json');
+        });
+        
+        /*
+        $('#cantidad').on('valueChanged', function (event) {
+            var value = $("#cantidad").val();
+            if (value < 0){
+                $("#tramo").jqxDropDownList({selectedIndex: 0 });
+                $("#tramo").jqxDropDownList({ disabled: true }); 
+            } else {
+                $("#tramo").val('Competitiva');
+                $("#tramo").jqxDropDownList({selectedIndex: 1 });
+                $("#tramo").jqxDropDownList({ disabled: false }); 
+            }
+        });
+        */
+        
+        $("#tramo").on('change', function(event){
+            var args = event.args;
+            if (args){
+                $('#form').jqxValidator('hideHint', '#cantidad');
+                if (args.index == 0) { //No Competitiva
+                    $("#precio").val(0);
+                    $("#filaPrecio").hide();
+                    $('#form').jqxValidator('hideHint', '#precio');
+                } else { //Competitiva
+                    $("#filaPrecio").show();
+                }
+            }
+        });
+        
+        /*
+        $("#moneda").on('change', function(event){
+            var args = event.args;
+            if (args){
+                if (args.item.value == '$'){
+                    $("#filaCable").hide();
+                    $("#cable").jqxCheckBox('uncheck');
+                } else {
+                    $("#filaCable").show();
+                }
+                var datos = {cierrebono_id: cierre_id, moneda: getDropDown("#moneda")};
+                var url = '/bono/getPlazos';
+                $.post(url, datos, function(plazos){
+                    $("#plazo").jqxDropDownList('clear'); 
+                    $.each(plazos, function(index,value){
+                        $("#plazo").jqxDropDownList('addItem', value ); 
+                    });
+                    setDropDown("#plazo", plazoCargado);
+                }, 'json');
+            }
+        });
+        
+        $("#plazo").on('change', function(event){
+            var args = event.args;
+            if (args){
+                plazoCargado = args.item.value;
+            }
+        });
+        */
+    
+        if ($("#id").val() == 0){
+            $("#titulo").text('Nueva Orden Acciones');
+            $("#filaCable").hide();
+        } else {
+            $("#titulo").text('Editar Orden Acciones');
+            datos = {
+                id: $("#id").val()
+            };
+            $.post('/bono/getOrden', datos, function(data){
+                cierrebono_id = data.cierrebono_id;
+                DAMonedas.data = {cierrebono_id: cierrebono_id};
+                DAMonedas.dataBind();
+                $("#numComitente").val(data.numcomitente);
+                
+                $("#comision").val(data.comision);
+                $("#cantidad").val(data.cantidad);
+                $("#precio").val(data.precio);
+                //$("#cable").jqxCheckBox('uncheck');
+                setDropDown("#moneda", data.moneda);
+                /*
+                if (data.cable == 1){
+                    $("#cable").jqxCheckBox('check');
+                } 
+                */
+                //plazoCargado = data.plazo;
+                $("#tramo").val(data.tramo);
+                $("#numComitente").focus();
+            }
+            , 'json');
+        };
+         $('#form').jqxValidator({ rules: [
+                { input: '#numComitente', message: 'Debe Seleccionar un comitente existente!', action: 'keyup, blur',  rule: function(){
+                    var result;
+                    if (!comitente){
+                        result = false;
+                    } else {
+                        result = true;
+                    }
+                    return result;
+                }},
+                { input: '#moneda', message: 'Debe Seleccionar la moneda!', action: 'keyup, blur',  rule: function(){
+                    return ($("#moneda").jqxDropDownList('getSelectedIndex') != -1);
+                }},
+                /*
+                { input: '#plazo', message: 'Debe elegir el plazo!', action: 'change',  rule: function(){
+                    return ($("#plazo").val() >= 28);
+                }},
+                */
+                { input: '#cantidad', message: 'Cantidad incorrecta!', action: 'keyup, blur',  rule: function(){
+                    var result = true;
+                    var minimo;
+                    var multiplo;
+                    /*
+                    if ($("#tramo").jqxDropDownList('getSelectedIndex') == 0){
+                        if ($("#tipoPersona").val() == "FISICA"){
+                            minimo = 1000;
+                        } else {
+                            minimo = 10000;
+                        }
+                        multiplo = 1000;
+                    } else {
+                        minimo = 1000000;
+                        multiplo = 100000;
+                    }
+                    */
+                    minimo = 10000;
+                    multiplo = 1;
+                    
+                    
+                    var cantidad = $("#cantidad").val();
+                    $('#form').jqxValidator('hideHint', '#cantidad');
+                    if (cantidad < minimo){
+                        $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser mayor o igual que " + minimo.toString() + "!";
+                        result = false;
+                    } else {
+                        if (cantidad % multiplo > 0){
+                            $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser multiplo de " + multiplo.toString() +"!";
+                            result = false;
+                        }
+                    }
+                    return result;
+                }},
+                { input: '#comision', message: 'Valor incorrecto!', action: 'keyup, blur',  rule: function(){
+                    if ($("#comision").val() > 3) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }},
+                { input: '#precio', message: 'El precio debe ser mayor que cero!', action: 'keyup, blur',  rule: function(){
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#precio").val() == 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }} /*,
+                { input: '#precio', message: 'El precio debe expresarse como 0,XXXX !', action: 'keyup, blur',  rule: function(){
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1  && $("#precio").val() >= 1) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }} */
+            ], 
+            theme: theme
+        });
+        $('#form').bind('validationSuccess', function (event) { formOK = true; });
+        $('#form').bind('validationError', function (event) { formOK = false; }); 
+        
+        $('#aceptarButton').jqxButton({ theme: theme, width: '65px' });
+        $('#aceptarButton').bind('click', function () {
+            $('#form').jqxValidator('validate');
+            if (formOK){                
+                $('#ventanaBono').ajaxloader();
+                var cable = 0;
+                if ($("#cable").val()){
+                    cable = 1;
+                }
+                
+                datos = {
+                    id: $("#id").val(),
+                    tramo: $("#tramo").val(),
+                    numComitente: $("#numComitente").val(),
+                    moneda: $("#moneda").val(),
+                    /*
+                    cable: cable,
+                    plazo: $("#plazo").val(),
+                    */
+                    comision: $("#comision").val(),
+                    cantidad: $("#cantidad").val(),
+                    precio: $("#precio").val(),
+                    comitente: $("#comitente").val(),
+                    tipoPersona: $("#tipoPersona").val(),
+                    oficial: $("#oficial").val(),
+                    cuit: $("#cuit").val()
+                };
+                $.post('/bono/saveOrden', datos, function(data){
+                    if (data.id > 0){
+                        //if ($('#origen').val('procesar')){
+                        //    $.redirect('/lebac/procesar');
+                        //} else {
+                            $.redirect('/bono');
+                        //}
+                    } else {
+                        new Messi('Hubo un error guardando la orden', {title: 'Error', 
+                            buttons: [{id: 0, label: 'Cerrar', val: 'X'}], modal:true, titleClass: 'error'});
+                        $('#ventanaBono').ajaxloader('hide');
+                    }
+                }, 'json');
+            }
+        });                
+        
+        
+    });
+    
+    //Aca va el codigo de la calculadora de lebacs
+    $(function(){
+        
+    });
+</script>

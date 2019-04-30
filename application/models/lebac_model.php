@@ -385,11 +385,12 @@ class Lebac_model extends CI_Model{
                 ORDER BY cierre_id, moneda, plazo ";
         $resultado = R::getAll($sql);
         
-        $contenido = "";
+        //$contenido = "";
         $colocacionAnterior = 0;
         $contenidoInd = 0;
         foreach ($resultado as $indice=>$fila){
             $plazo = R::findOne('plazo', 'cierre_id = ? and moneda = ? and plazo = ?', array($fila['cierre_id'], $fila['moneda'], $fila['plazo']));
+            /* 
             if ($fila['tramo'] == 'Competitiva'){
                 $titulo = $plazo->tituloC;
                 $precio = $fila['precio'];
@@ -401,6 +402,60 @@ class Lebac_model extends CI_Model{
                     $titulo = $plazo->tituloNCF;
                 }
             }
+             */ 
+            
+            /* 2019-02-18 Lo comento.
+            if ($fila['moneda'] == '$'){
+                if ($fila['tramo'] == 'Competitiva'){
+                    $precio = $fila['precio'];
+                    $titulo = $plazo->tituloC;
+                } else {
+                    $precio = '';
+                    if ($fila['tipopersona'] == 'JURIDICA'){
+                        $titulo = $plazo->tituloNCJ;
+                    } else {
+                        $titulo = $plazo->tituloNCF;
+                    }                                        
+                }
+            } else {
+                if ($fila['tramo'] == 'Competitiva'){
+                    $titulo = $plazo->tituloC;
+                    $precio = $fila['precio'];
+                } else {
+                    $precio = '';
+                    if ($fila['tipopersona'] == 'JURIDICA'){
+                        $titulo = $plazo->tituloNCJ;
+                    } else {
+                        $titulo = $plazo->tituloNCF;
+                    }                                        
+                }
+                break;
+            }
+            */
+            
+            switch ($fila['moneda']){
+                case '$':
+                    if ($fila['tramo'] == 'Competitiva'){
+                        $titulo = utf8_decode('LECER en Pesos 122 dias  Vto. 30/08/2019 Tramo Competitivo - Integración Pesos');
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode('LECER en Pesos 122 dias  Vto. 30/08/2019 Tramo NO Competitivo - Integración Pesos');
+                        $precio = '';
+                    }
+                    break;
+
+                case 'u$s':
+                    if ($fila['tramo'] == 'Competitiva'){
+                        $titulo = utf8_decode('LECER en Pesos 122 dias  Vto. 30/08/2019 Tramo Competitivo - Integración Dolares');
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode('LECER en Pesos 122 dias  Vto. 30/08/2019 Tramo NO Competitivo - Integración Dolares');
+                        $precio = '';
+                    }
+                    break;
+            }
+            
+            
             
             $colocacion = $plazo->colocacion;
             if ($indice == 0){
@@ -412,10 +467,16 @@ class Lebac_model extends CI_Model{
                 $colocacionAnterior = $colocacion;
             }
             
+            if ($fila['tipopersona'] == 'FISICA'){
+                $tipoPersona = 'Persona Fisica';
+            } else {
+                $tipoPersona = 'Persona Juridica';
+            }
+            
             
             
             $contenido[$contenidoInd]['colocacion'] = $colocacion;
-            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t\t" . $fila['cuit']  .  "\r\n";
+            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t\t" . $fila['cuit']  . "\t\t\t\t" . $tipoPersona .  "\t\t\tCUIT\r\n";
             
         }
         $this->load->library('zip');

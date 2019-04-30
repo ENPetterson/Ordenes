@@ -26,6 +26,16 @@
                     <td style="padding-right:10px; padding-bottom: 10px">Colocacion u$s: </td>
                     <td><div id="colocacionDolares"></div></td>
                 </tr>
+                <!--
+                <tr>
+                    <td style="padding-right:10px; padding-bottom: 10px">Colocacion Lebacs Nov: </td>
+                    <td><div id="colocacionLebacsNov"></div></td>
+                </tr>
+                <tr>
+                    <td style="padding-right:10px; padding-bottom: 10px">Colocacion Lebacs Dic: </td>
+                    <td><div id="colocacionLebacsDic"></div></td>
+                </tr>
+                -->
                 <tr>
                     <td colspan="2" style="text-align: center; padding-top: 1em">
                         <input type="button" id="aceptarButton" value="Aceptar">
@@ -40,13 +50,17 @@
         var theme = getTheme();
         var formOK = false;
         
-        $("#ventanaCierre").jqxWindow({showCollapseButton: false, height: '240px', width: '500px', theme: theme,
+        $("#ventanaCierre").jqxWindow({showCollapseButton: false, height: '270px', width: '500px', theme: theme,
         resizable: false, keyboardCloseKey: -1});
         $("#fechaHora").jqxDateTimeInput({ formatString: "dd/MM/yyyy HH:mm", showTimeButton: true, width: '250px', height: '25px', theme: theme });
         $("#plazos").jqxInput({theme: theme, height: '25px', width: '250px' });
         $("#minimos").jqxInput({theme: theme, height: '25px', width: '250px' });
         $("#colocacionPesos").jqxNumberInput({ width: '250px', height: '25px', theme:theme, digits:6, decimalDigits: 0});
         $("#colocacionDolares").jqxNumberInput({ width: '250px', height: '25px', theme:theme, digits:6, decimalDigits: 0});
+        /*
+        $("#colocacionLebacsNov").jqxNumberInput({ width: '250px', height: '25px', theme:theme, digits:6, decimalDigits: 0});
+        $("#colocacionLebacsDic").jqxNumberInput({ width: '250px', height: '25px', theme:theme, digits:6, decimalDigits: 0});
+        */
     
         if ($("#id").val() == 0){
             $("#titulo").text('Nuevo Cierre Letes');
@@ -61,6 +75,10 @@
                 $("#minimos").val(data.minimos);
                 $("#colocacionPesos").val(data.colocacionPesos);
                 $("#colocacionDolares").val(data.colocacionDolares);
+                /*
+                $("#colocacionLebacsNov").val(data.colocacionLebacsNov);
+                $("#colocacionLebacsDic").val(data.colocacionLebacsDic);
+                */
             }
             , 'json');
         };
@@ -86,6 +104,14 @@
                     { input: '#colocacionDolares', message: 'Debe ingresar el numero de colocación en dolares!',  rule: function(){
                         return $("#colocacionDolares").val() > 30;
                     } },
+                    /*
+                    { input: '#colocacionLebacsNov', message: 'Debe ingresar el numero de colocación en lebacs Nov!',  rule: function(){
+                        return $("#colocacionLebacsNov").val() > 30;
+                    } },
+                    { input: '#colocacionLebacsDic', message: 'Debe ingresar el numero de colocación en lebacs Dic!',  rule: function(){
+                        return $("#colocacionLebacsDic").val() > 30;
+                    } },
+                    */
                     { input: '#fechaHora', message: 'Ya existe un cierre con esa fecha y hora!',  rule: function(){
                             var fechaHora = moment($("#fechaHora").jqxDateTimeInput('val','date'));
                             datos = {
@@ -125,6 +151,12 @@
                     minimos: $("#minimos").val(),
                     colocacionPesos: $("#colocacionPesos").val(),
                     colocacionDolares: $("#colocacionDolares").val()
+                    /*
+                    ,
+                    
+                    colocacionLebacsNov: $("#colocacionLebacsNov").val(),
+                    colocacionLebacsDic: $("#colocacionLebacsDic").val()
+                    */
                 }
                 $.post('/letes/saveCierre', datos, function(data){
                     if (data.id > 0){

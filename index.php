@@ -54,6 +54,7 @@ if (defined('ENVIRONMENT')) {
             break;
         
         case 'allaria':
+            
             error_reporting(0);
             break;
 

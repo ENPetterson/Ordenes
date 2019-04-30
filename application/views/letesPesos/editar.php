@@ -101,8 +101,8 @@
         $("#cable").jqxCheckBox({height: '20px', theme: theme});
         $("#plazo").jqxDropDownList({ width: '110px', height: '25px', theme: theme, placeHolder: 'elija plazo'});
         $("#comision").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 1, groupSeparator: ' ', max: 99, theme: theme});
-        $("#cantidad").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999, theme: theme});
-        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 3, digits: 3, groupSeparator: ' ', max: 999.999, theme: theme});
+        $("#cantidad").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 9999999999, theme: theme});
+        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 4, groupSeparator: ' ', max: 9999.99, theme: theme});
         //*$("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 3, groupSeparator: ' ', max: 999.99, theme: theme});
         $("#comitente").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
         $("#tipoPersona").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
@@ -150,19 +150,17 @@
             }
         });
 
-        /*
+        
         $('#cantidad').on('valueChanged', function (event) {
             var value = $("#cantidad").val();
-            if (value < 1000000){
+            if (value < 2000000){
                 $("#tramo").jqxDropDownList({selectedIndex: 0 });
-                $("#tramo").jqxDropDownList({ disabled: true }); 
-            } else {
-                $("#tramo").val('Competitiva');
-                $("#tramo").jqxDropDownList({selectedIndex: 1 });
                 $("#tramo").jqxDropDownList({ disabled: false }); 
+            } else {
+                $("#tramo").jqxDropDownList({selectedIndex: 1 });
+                $("#tramo").jqxDropDownList({ disabled: true }); 
             }
         });
-        */
         
         $("#tramo").on('change', function(event){
             var args = event.args;
@@ -255,10 +253,17 @@
                     var result = true;
                     var minimo;
                     var multiplo;
-                    var maximo = 100000000;
+                    var maximo = 0;
                     var minimo = 10000;
                     var multiplo = 1;
                     var cantidad = $("#cantidad").val();
+                    
+                    if ($("#tramo").jqxDropDownList('getSelectedIndex') == 0){
+                        maximo = 2000001;
+                    } else {
+                        maximo = 0;
+                    }
+                    
                     $('#form').jqxValidator('hideHint', '#cantidad');
                     if (maximo > 0 && cantidad > maximo){
                         $('#form').jqxValidator('rules')[3].message = "La cantidad no puede ser mayor que " + maximo.toString() + "!";
@@ -290,13 +295,20 @@
                         return true;
                     }
                 }},
-                { input: '#precio', message: 'El precio debe ser menor que 1000 !', action: 'keyup, blur',  rule: function(){
-                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1  && $("#precio").val() >= 1000) {
+                { input: '#precio', message: 'El precio debe ser menor que 9999 !', action: 'keyup, blur',  rule: function(){
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1  && $("#precio").val() >= 9999) {
                         return false;
                     } else {
                         return true;
                     }
-                }}
+                }},
+//                { input: '#precio', message: 'El precio debe ser múltiplo de 1000 !', action: 'keyup, blur',  rule: function(){
+//                    if ($("#precio").val() % 1000 != 0){
+//                            $('#form').jqxValidator('rules')[3].message = "El precio debe ser multiplo de 1000!";
+//                            result = false;
+//                    }
+//                    return result;
+//                }}
             ], 
             theme: theme
         });

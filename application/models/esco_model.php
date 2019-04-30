@@ -11,8 +11,7 @@ class Esco_model extends CI_Model {
                     $this->dbhTest = new PDO ("sqlsrv:server=srv-vbolsa0;database=test","sa","25DeMayo");
                     break;
                 case 'allaria':
-                    $this->dbh = new PDO("dblib:host=srv-vbolsa0.allaria.local;dbname=VBolsa", "sa", "25DeMayo");
-                    $this->dbhTest = new PDO("dblib:host=srv-vbolsa0.allaria.local;dbname=test", "sa", "25DeMayo");
+                    $this->dbh = new PDO("sqlsrv:Server=srv-vbolsa0.allaria.local;Database=VBolsa", "sa", "25DeMayo");
                     break;                    
                 case 'desajavier':
                     $this->dbh = new PDO("dblib:host=srv-vbolsa0;dbname=VBolsa", "sa", "25DeMayo");
@@ -73,6 +72,7 @@ class Esco_model extends CI_Model {
     }
     
     function getPosicionMonetaria(){
+        /*
         $sql0 = "exec sp_disponible";
         $stmt0 = $this->dbhTest->prepare($sql0);
         $stmt0->execute();
@@ -84,6 +84,8 @@ class Esco_model extends CI_Model {
         $results=$stmt->fetchAll(PDO::FETCH_ASSOC);        
         unset($stmt);
         return $this->utf8_converter($results);
+         * 
+         */
     }
     
     function getPosicionLebacs(){

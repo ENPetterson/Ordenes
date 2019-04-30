@@ -271,8 +271,28 @@
                     if (minimo == 0){
                         minimo = 10000;
                     }
+                    
+                    
+                    
+                    
                     var cantidad = $("#cantidad").val();
                     $('#form').jqxValidator('hideHint', '#cantidad');
+                    
+                    
+                    
+                    var maximo = 0;
+                    if ($("#tramo").jqxDropDownList('getSelectedIndex') == 0){
+                        maximo = 2000000;
+                    } else {
+                        maximo = 0;
+                    }
+                    if (maximo > 0 && cantidad > maximo){
+                        $('#form').jqxValidator('rules')[3].message = "La cantidad no puede ser mayor que " + maximo.toString() + "!";
+                        result = false;
+                    }
+                    
+                    
+                    
                     if (cantidad < minimo){
                         $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser mayor o igual que " + minimo.toString() + " !";
                         result = false;

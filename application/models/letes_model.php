@@ -28,7 +28,10 @@ class Letes_model extends CI_Model{
     public $minimos;
     public $colocacionPesos;
     public $colocacionDolares;
-    
+    /*
+    public $colocacionLebacsNov;
+    public $colocacionLebacsDic;
+    */
     private $workbook;
     private $sheetIndex;
     
@@ -159,6 +162,11 @@ class Letes_model extends CI_Model{
         $cierre->minimos = $this->minimos;
         $cierre->colocacionPesos = $this->colocacionPesos;
         $cierre->colocacionDolares = $this->colocacionDolares;
+        /*
+        $cierre->colocacionLebacsNov = $this->colocacionLebacsNov;
+        $cierre->colocacionLebacsDic = $this->colocacionLebacsDic;
+         * 
+         */
         R::store($cierre);
         return $cierre->export();
     }
@@ -255,38 +263,110 @@ class Letes_model extends CI_Model{
             $cierre = R::load('cierreletes', $fila['cierreletes_id']);
             
             
-            $tramo = 'Tramo General';
-            if ($fila['tipopersona'] == 'FISICA'){
-                $tipoPersona = "Persona Fisica";
-                if ($fila['cantidad'] <= 50000){
-                    $tramo = 'Tramo Minorista';
-                }
+            /*
+             * 
+             *   Esto es para LECAPS  
+             * 
+            if ($fila['plazo'] == '213'){
+                $vencimiento = '31/05/2019';
             } else {
-                $tipoPersona = "Persona Juridica";
+                $vencimiento = '30/04/2020';
             }
-            
-            if ($fila['moneda'] == '$'){
-                $colocacion = $cierre->colocacionPesos;
-                $integracion = ' - Integracion Pesos';
-            } else {
-                $colocacion = $cierre->colocacionDolares;
-                $integracion = ' - Integracion Dolares';
+             * 
+            switch ($fila['moneda']){
+                case '$':
+                    if ($fila['tramo'] == 'Competitiva') {
+                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - Int Pesos - Tramo Competitivo");
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - Int Pesos - Tramo NO Competitivo");
+                        $precio = '';
+                    }
+                    $colocacion = $cierre['colocacionPesos'];
+                    break;
+                case 'LN':
+                    if ($fila['tramo'] == 'Competitiva') {
+                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - INT LEBAC NOVIEMBRE - Tramo Competitivo");
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - INT LEBAC NOVIEMBRE - Tramo NO Competitivo");
+                        $precio = '';
+                    }
+                    $colocacion = $cierre['colocacionLebacsNov'];                    
+                    break;
+                case 'LD':
+                    if ($fila['tramo'] == 'Competitiva') {
+                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - INT LEBAC DICIEMBRE - Tramo Competitivo");
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - INT LEBAC DICIEMBRE - Tramo NO Competitivo");
+                        $precio = '';
+                    }
+                    $colocacion = $cierre['colocacionLebacsDic'];                    
+                    break;
+                case 'u$s':
+                    if ($fila['tramo'] == 'Competitiva') {
+                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - Int Dolares - Tramo Competitivo");
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - Int Dolares - Tramo NO Competitivo");
+                        $precio = '';
+                    }
+                    $colocacion = $cierre['colocacionDolares'];
+                    
+                    break;
             }
+             * 
+             */
+            /*
+            switch ($fila['moneda']){
+                case '$':
+                    if ($fila['tramo'] == 'Competitiva') {
+                        $titulo = utf8_decode("Letras 196 dias Vto. 28/06/2019 Tramo Competitivo - Integración Pesos");
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode("Letras 196 dias Vto. 28/06/2019 Tramo NO Competitivo - Integración Pesos");
+                        $precio = '';
+                    }
+                    $colocacion = $cierre['colocacionPesos'];
+                    break;
+                case 'u$s':
+             * 
+             */
             
+            // 2019/02/18 Se comenta.
+//                    if ($fila['tramo'] == 'Competitiva') {
+//                        $titulo = utf8_decode("LETES a 217 dias  Vto 13/09/2019  Tramo Competitivo");
+//                        $precio = $fila['precio'];
+//                    } else {
+//                        $titulo = utf8_decode("LETES a 217 dias  Vto 13/09/2019 Tramo NO Competitivo");
+//                        $precio = '';
+//                    }
+//                    $colocacion = $cierre['colocacionDolares'];
+            // 2019/02/18
             if ($fila['tramo'] == 'Competitiva') {
-                $tramo = 'Tramo Competitivo';
-                $precio = $fila['precio'];
+                        $titulo = utf8_decode("Letras 217 dias Vto. 29/11/2019 Tramo Competitivo");
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode("Letras 217 dias Vto. 29/11/2019 Tramo NO Competitivo");
+                        $precio = '';
+                    }
+            $colocacion = $cierre['colocacionDolares'];    
+            
+            if ($fila['tipopersona'] == 'FISICA'){
+                $tipoPersona = 'Persona Fisica';
             } else {
-                $tramo = 'Tramo NO Competitivo';
-                $precio = '';
+                $tipoPersona = 'Persona Juridica';
             }
-            
-            
-            
-            
-            //$titulo = $tramo . ' U$S ' . $fila['plazo'] . ' dias' . $integracion;
-            $titulo = 'Letras de ' . $fila['plazo'] . ' dias ' . $tramo . $integracion;
-            
+                    
+                    
+                    
+                    
+            /*
+                    break;
+            }
+            */
+                
             if ($indice == 0){
                 $colocacionAnterior = $colocacion;
             }
@@ -300,8 +380,8 @@ class Letes_model extends CI_Model{
             //$contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t\t" . $fila['cantidad'] . "\t\t" . $this->formatearCuit($fila['cuit']) . "\t" . $fila['numcomitente'] . "\r\n";
             //Oferta;Colocación;Colocador;Título;Fecha Liq.;Agente;De Terceros;Tipo;Valor;%/$;Cantidad;Moneda;Porc. Inv.;Estado;Fecha Ing.;Observaciones;Cliente/Comitente;CUIT;Nombre;Nacionalidad;Categoria;Tipo Persona
 
-            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t\t" . $fila['cuit'] . "\t\t\t\t" . $tipoPersona .  "\r\n";
-            
+            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t\t" . $fila['cuit'] . "\t\t\t\t" . $tipoPersona .  "\t\t\tCUIT\r\n";
+                
         }
         
         $this->load->library('zip');

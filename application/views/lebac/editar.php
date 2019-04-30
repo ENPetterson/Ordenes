@@ -32,7 +32,7 @@
                     <td><div id="cantidad"></div></td>
                 </tr>
                 <tr id="filaPrecio">
-                    <td style="padding-right:10px; padding-bottom: 10px">Precio por cada 1000: </td>
+                    <td style="padding-right:10px; padding-bottom: 10px">Precio: </td>
                     <td><div id="precio" ></div></td>
                 </tr>
                 <tr>
@@ -98,8 +98,8 @@
         $("#plazo").jqxDropDownList({ width: '110px', height: '25px', theme: theme, placeHolder: 'elija plazo'});
         $("#comision").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 1, groupSeparator: ' ', max: 99, theme: theme});
         $("#cantidad").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 12, groupSeparator: ' ', max: 999999999999, theme: theme});
-        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 10, digits: 1, groupSeparator: ' ', max: 999999999.99, theme: theme});
-        //*$("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 3, groupSeparator: ' ', max: 999.99, theme: theme});
+        /*$("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 6, digits: 1, groupSeparator: ' ', max: 999999999.999999, theme: theme});*/
+        $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 4, groupSeparator: ' ', max: 9999.99, theme: theme});
         $("#comitente").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
         $("#tipoPersona").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
         $("#oficial").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
@@ -137,13 +137,20 @@
         
         $('#cantidad').on('valueChanged', function (event) {
             var value = $("#cantidad").val();
-            if (value < 1000000){
+            if (value < 2000000){
                 $("#tramo").jqxDropDownList({selectedIndex: 0 });
                 $("#tramo").jqxDropDownList({ disabled: true }); 
             } else {
                 $("#tramo").val('Competitiva');
                 $("#tramo").jqxDropDownList({selectedIndex: 1 });
-                $("#tramo").jqxDropDownList({ disabled: false }); 
+                $("#tramo").jqxDropDownList({ disabled: true }); 
+                /*
+                if (value >= 10000000) {
+                    $("#tramo").jqxDropDownList({ disabled: true }); 
+                } else {
+                    $("#tramo").jqxDropDownList({ disabled: false }); 
+                }
+                */
             }
         });
         
@@ -231,15 +238,15 @@
                     var maximo = 0;
                     if ($("#tramo").jqxDropDownList('getSelectedIndex') == 0){
                         if ($("#tipoPersona").val() == "FISICA"){
-                            minimo = 1000;
+                            minimo = 10000;
                         } else {
                             minimo = 10000;
                         }
-                        multiplo = 1000;
-                        maximo = 50000000;
+                        multiplo = 1;
+                        maximo = 2000000;
                     } else {
                         minimo = 1000000;
-                        multiplo = 100000;
+                        multiplo = 1;
                         maximo = 0;
                     }
                     var cantidad = $("#cantidad").val();
@@ -274,13 +281,13 @@
                         return true;
                     }
                 }},
-                { input: '#precio', message: 'El precio debe expresarse como 0,XXXX !', action: 'keyup, blur',  rule: function(){
-                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1  && $("#precio").val() >= 1) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }}
+//                { input: '#precio', message: 'El precio debe expresarse como 0,XXXXXX !', action: 'keyup, blur',  rule: function(){
+//                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1  && $("#precio").val() >= 1) {
+//                        return false;
+//                    } else {
+//                        return true;
+//                    }
+//                }}
             ], 
             theme: theme
         });
