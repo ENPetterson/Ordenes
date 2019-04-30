@@ -3,7 +3,7 @@ class Bono extends MY_AuthController {
     public function __construct() {
         parent::__construct();
     }
-    
+    //Test
     public function index(){
         $this->load->view('template/encabezado');
         $this->load->view('template/menu');
