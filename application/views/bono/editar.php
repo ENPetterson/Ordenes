@@ -15,10 +15,10 @@
                     <td style="padding-right:10px; padding-bottom: 10px">Numero Comitente: </td>
                     <td><div id="numComitente" ></div></td>
                 </tr>
-                <tr>
+<!--                <tr>
                     <td style="padding-right: 10px; padding-bottom: 10px">Tipo de Inversor:</td>
                     <td><div id="tipoInversor"></div></td>
-                </tr>
+                </tr>-->
                 <tr>
                     <td style="padding-right: 10px; padding-bottom: 10px">Moneda:</td>
                     <td><div id="moneda"></div></td>
@@ -88,14 +88,18 @@
         
         $("#tramo").jqxDropDownList({ width: '300px', height: '25px', source: ['No Competitiva', 'Competitiva'], theme: theme, selectedIndex: 0, disabled: false});
         $("#numComitente").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999});
-        var tipoInversor = [
-            {value: 'I', label: 'Institucional'},
-            {value: 'M', label: 'Minorista'},
-            {value: 'P', label: 'Cartera Propia'}/*,
-             {value: 'R', label: 'No Residente'}, 
-            {value: 'C', label: 'Corporativo'}*/
-        ];
-        $("#tipoInversor").jqxDropDownList({ width: '300px', height: '25px', source: tipoInversor, theme: theme, placeHolder: 'elija el tipo de inversor'});
+        
+        
+//        var tipoInversor = [
+//            {value: 'I', label: 'Institucional'},
+//            {value: 'M', label: 'Minorista'},
+//            {value: 'P', label: 'Cartera Propia'}/*,
+//             {value: 'R', label: 'No Residente'}, 
+//            {value: 'C', label: 'Corporativo'}*/
+//        ];
+//        $("#tipoInversor").jqxDropDownList({ width: '300px', height: '25px', source: tipoInversor, theme: theme, placeHolder: 'elija el tipo de inversor'});
+        
+        
         var monedas = [
             { value: '$', label: 'Peso'},
             { value: 'u$s', label: 'Dolar'}
@@ -187,7 +191,7 @@
         */
     
         if ($("#id").val() == 0){
-            $("#titulo").text('Nueva Orden CEPU');
+            $("#titulo").text('Nueva Orden Letes 140');
             $("#filaCable").hide();
             /*
              * 
@@ -215,7 +219,7 @@
                 $("#cantidad").val(data.cantidad);
                 $("#precio").val(data.precio);
                 $("#cable").jqxCheckBox('uncheck');
-                $("#tipoInversor").val(data.tipoInversor);
+//                $("#tipoInversor").val(data.tipoInversor);
                 if(data.moneda == '$'){
                     $("#moneda").jqxDropDownList('selectIndex', 0);
                 } else {
@@ -255,9 +259,9 @@
                     }
                     return result;
                 }},
-                { input: '#tipoInversor', message: 'Debe Seleccionar el tipo de inversor!', action: 'keyup, blur',  rule: function(){
-                    return ($("#tipoInversor").jqxDropDownList('getSelectedIndex') != -1);
-                }},
+//                { input: '#tipoInversor', message: 'Debe Seleccionar el tipo de inversor!', action: 'keyup, blur',  rule: function(){
+//                    return ($("#tipoInversor").jqxDropDownList('getSelectedIndex') != -1);
+//                }},
                 { input: '#moneda', message: 'Debe Seleccionar la moneda!', action: 'keyup, blur',  rule: function(){
                     return ($("#moneda").jqxDropDownList('getSelectedIndex') != -1);
                 }},
@@ -268,8 +272,9 @@
                 */
                 { input: '#cantidad', message: 'Cantidad incorrecta!', action: 'keyup, blur',  rule: function(){
                     var result = true;
+                    
                     if (minimo == 0){
-                        minimo = 10000;
+                        minimo = 50000;
                     }
                     
                     
@@ -286,17 +291,17 @@
                     } else {
                         maximo = 0;
                     }
-                    if (maximo > 0 && cantidad > maximo){
-                        $('#form').jqxValidator('rules')[3].message = "La cantidad no puede ser mayor que " + maximo.toString() + "!";
-                        result = false;
-                    }
+//                    if (maximo > 0 && cantidad > maximo){
+//                        $('#form').jqxValidator('rules')[3].message = "La cantidad no puede ser mayor que " + maximo.toString() + "!";
+//                        result = false;
+//                    }
                     
                     
                     
-                    if (cantidad < minimo){
-                        $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser mayor o igual que " + minimo.toString() + " !";
-                        result = false;
-                    } 
+//                    if (cantidad < minimo){
+//                        $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser mayor o igual que " + minimo.toString() + " !";
+//                        result = false;
+//                    } 
                     return result;
                 }},
                 { input: '#comision', message: 'Valor incorrecto!', action: 'keyup, blur',  rule: function(){
@@ -349,7 +354,7 @@
                     id: $("#id").val(),
                     tramo: $("#tramo").val(),
                     numComitente: $("#numComitente").val(),
-                    tipoInversor: $("#tipoInversor").val(),
+//                    tipoInversor: $("#tipoInversor").val(),
                     moneda: $("#moneda").val(),
                     cable: cable,
                     /*

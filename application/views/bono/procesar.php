@@ -18,6 +18,8 @@
             async: false
         };
         var DACierre = new $.jqx.dataAdapter(srcCierre);
+
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
         
         $("#cierre").on('bindingComplete', function(event){
             $.post('/bono/getCierreActual', function(cierre){
@@ -322,6 +324,9 @@
     });
 </script>
 <div id="cierre"></div>
+<br>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Procesar Letes 140</ul></div>
+<br>
 <br>
 <div id="grilla"></div>
 <div id="botonera">

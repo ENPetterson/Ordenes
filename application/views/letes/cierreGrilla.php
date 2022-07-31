@@ -5,6 +5,8 @@
         var id = 0;
         var fechaCierre;
 
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
+
         var source =
         {
                 datatype: "json",
@@ -115,6 +117,10 @@
         
     });
 </script>
+<div>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Grilla Cierre Letes</ul></div>
+<br>
+<br>
 <div id="grilla"></div>
 <div>
     <table boder="0" cellpadding="2" cellspacing="2">
@@ -124,4 +130,5 @@
             <td><input type="button" value="Borrar" id="borrarButton"></td>
         </tr>
     </table>
+</div>
 </div>

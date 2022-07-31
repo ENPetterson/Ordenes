@@ -25,18 +25,67 @@ class Cupon extends MY_AuthController {
         $this->load->model('Cupon_model');
         $this->Cupon_model->id = $this->input->post('id');
         $this->Cupon_model->numComitente = $this->input->post('numComitente');
-        $this->Cupon_model->comision = $this->input->post('comision');
+        
+//        $this->Cupon_model->comision = $this->input->post('comision');
         $this->Cupon_model->cantidad = $this->input->post('cantidad');
-        $this->Cupon_model->cantidadACrecer = $this->input->post('cantidadACrecer');
-        $this->Cupon_model->precio = $this->input->post('precio');
-        $this->Cupon_model->segundaParte = $this->input->post('segundaParte');
-        $this->Cupon_model->cantidadAcrecerSegunda = $this->input->post('cantidadAcrecerSegunda');
+        $this->Cupon_model->plazo = $this->input->post('plazo');
+        $this->Cupon_model->arancel = $this->input->post('arancel');
+
+        $this->Cupon_model->bono = $this->input->post('bono');
+       
+        $this->Cupon_model->bonoNombre = $this->input->post('bonoNombre');
+        $this->Cupon_model->tipo = $this->input->post('tipo');
+//        $this->Cupon_model->cantidadACrecer = $this->input->post('cantidadACrecer');
+//        $this->Cupon_model->precio = $this->input->post('precio');
+//        $this->Cupon_model->segundaParte = $this->input->post('segundaParte');
+//        $this->Cupon_model->cantidadAcrecerSegunda = $this->input->post('cantidadAcrecerSegunda');
         $this->Cupon_model->comitente = $this->input->post('comitente');
         $this->Cupon_model->tipoPersona = $this->input->post('tipoPersona');
         $this->Cupon_model->oficial = $this->input->post('oficial');
         $this->Cupon_model->cuit = $this->input->post('cuit');
+        $this->Cupon_model->posicion = $this->input->post('posicion');
+        $this->Cupon_model->estaConfirmado = $this->input->post('estaConfirmado');
         $orden = $this->Cupon_model->saveOrden();
         echo json_encode($orden);
+    }
+    
+    public function comprobarEstadoCierre(){
+        $cierre = $this->input->post('cierre');
+        $this->load->model('Cupon_model');
+        $this->Cupon_model->cierre = $cierre;
+        $resultado = $this->Cupon_model->comprobarEstadoCierre();
+        echo json_encode($resultado);
+    }
+    
+    
+    public function getPlazos(){
+        $this->load->model('Cupon_model');
+        $this->Cupon_model->cierrecupon_id = $this->input->post('cierrecupon_id');
+//        $this->Cupon_model->moneda = $this->input->post('moneda');
+        $resultado = $this->Cupon_model->getPlazos();
+        echo json_encode($resultado);
+    }
+    
+    public function getEspecie(){
+        $this->load->model('Cupon_model');
+        $this->Cupon_model->plazo = $this->input->post('plazo');
+        $resultado = $this->Cupon_model->getEspecie();
+        echo json_encode($resultado);
+    }
+    
+    public function getPlazosEspecies(){
+        $this->load->model('Cupon_model');
+        $this->Cupon_model->cierrecupon_id = $this->input->post('cierrecupon_id');
+//        $this->Cupon_model->moneda = $this->input->post('moneda');
+        $resultado = $this->Cupon_model->getPlazosEspecies();
+        echo json_encode($resultado);
+    }
+    
+    public function getPlazosBono(){
+        $this->load->model('Cupon_model');
+        $this->Cupon_model->plazocupon_id = $this->input->post('plazocupon_id');
+        $resultado = $this->Cupon_model->getPlazosBono();
+        echo json_encode($resultado);
     }
     
     public function getOrden(){
@@ -106,19 +155,27 @@ class Cupon extends MY_AuthController {
     }
     
     public function saveCierre(){
-        $cierre_id = $this->input->post('cierrecupon_id');
+        $cierrecupon_id = $this->input->post('cierrecupon_id');
         $fechaHora = $this->input->post('fechahora');
+        $plazos = $this->input->post('plazos');
+        $plazosBorrar = $this->input->post('plazosBorrar');
+        $pausarCierre = $this->input->post('pausarCierre');
+//        $instrumento = $this->input->post('instrumento');
         $this->load->model('Cupon_model');
-        $this->Cupon_model->cierrecupon_id = $cierre_id;
+        $this->Cupon_model->cierrecupon_id = $cierrecupon_id;
         $this->Cupon_model->fechahora = $fechaHora;
+        $this->Cupon_model->plazos = $plazos;
+        $this->Cupon_model->plazosBorrar = $plazosBorrar;
+        $this->Cupon_model->pausarCierre = $pausarCierre;
+//        $this->Cupon_model->instrumento = $instrumento;
         $cierre = $this->Cupon_model->saveCierre();
         echo json_encode($cierre);
     }
     
     public function delCierre(){
-        $cierre_id = $this->input->post('id');
+        $cierrecupon_id = $this->input->post('id');
         $this->load->model('Cupon_model');
-        $this->Cupon_model->cierrecupon_id = $cierre_id;
+        $this->Cupon_model->cierrecupon_id = $cierrecupon_id;
         $this->Cupon_model->delCierre();
         echo json_encode(array('resultado'=>'Cierre borrado exitosamente'));
     }
@@ -236,6 +293,21 @@ class Cupon extends MY_AuthController {
         $this->Cupon_model->ordenes = $ordenes;
         $resultado = $this->Cupon_model->enviarMercado();
         echo json_encode($resultado);
+    }
+    
+    public function grabarExcel(){
+        
+        $archivo = $this->input->post('file');
+        $cierre = $this->input->post('cierre');
+
+        
+        $this->load->model('Cupon_model');
+        $this->Cupon_model->archivo = $archivo;
+        $this->Cupon_model->cierre = $cierre;
+        
+        $resultado = $this->Cupon_model->grabarExcel();
+        echo json_encode($resultado);
+        
     }
     
 }

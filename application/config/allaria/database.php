@@ -64,7 +64,21 @@ $db['default']['swap_pre'] = '';
 $db['default']['autoinit'] = TRUE;
 $db['default']['stricton'] = FALSE;
 
-
+$db['operaciones']['hostname'] = 'localhost';
+$db['operaciones']['username'] = 'root';
+$db['operaciones']['password'] = '25DeMayo';
+$db['operaciones']['database'] = 'operaciones';
+$db['operaciones']['dbdriver'] = 'mysqli';
+$db['operaciones']['dbprefix'] = '';
+$db['operaciones']['pconnect'] = TRUE;
+$db['operaciones']['db_debug'] = TRUE;
+$db['operaciones']['cache_on'] = FALSE;
+$db['operaciones']['cachedir'] = '';
+$db['operaciones']['char_set'] = 'utf8';
+$db['operaciones']['dbcollat'] = 'utf8_general_ci';
+$db['operaciones']['swap_pre'] = '';
+$db['operaciones']['autoinit'] = TRUE;
+$db['operaciones']['stricton'] = FALSE;
 
 
 /* End of file database.php */

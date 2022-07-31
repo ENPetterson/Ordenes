@@ -30,9 +30,9 @@
     
     table#botonera {
         width: 50%;
-        margin-left: 25%;
+        margin-left: 5%;
         margin-right: 25%;
-        margin-top: 10%;
+        margin-top: 0.5%;
     }
     
     .texto-cierre {
@@ -42,17 +42,47 @@
     }
 </style>
 <table id="botonera">
-    <tr>
+<!--    <tr>
         <td><button class="btn" id="btnLebacs">Lecer<div id="cierreLebacs" class="texto-cierre"></div></button></td>
         <td><button class="btn" id="btnLetes">Letes<div id="cierreLetes" class="texto-cierre"></div></button></td>
     </tr>
     <tr>
-        <td style="padding-top: 5em"><button class="btn" id="btnBono">BONCER 2021<div id="cierreBono" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnBono">Letes 140<div id="cierreBono" class="texto-cierre"></div></button></td>
         <td style="padding-top: 5em"><button class="btn" id="btnCupon">INVJ Cupones<div id="cierreCupon" class="texto-cierre"></div></button></td>
-    </tr>
-    <tr>
+    </tr>-->
+<!--    <tr>
         <td style="padding-top: 5em"><button class="btn" id="btnLetesPesos">Lecap<div id="cierreLetesPesos" class="texto-cierre"></div></button></td>
-        <td>&nbsp;</td>
+        <td style="padding-top: 5em"><button class="btn" id="btnSenebi">Senebi<div id="cierreSenebi" class="texto-cierre"></div></button></td>
+    </tr>
+    
+    <tr>
+        <td style="padding-top: 5em"><button class="btn" id="btnFondo">Fondos<div id="cierreFondo" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnCorreccionBoletos">Corrección Boletos<div id="correccionBoletos" class="texto-cierre"></div></button></td>
+    </tr>-->
+    
+    <tr>
+        <td style="padding-top: 5em"><button class="btn" id="btnSenebi">Senebi<div id="cierreSenebi" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnFondo">Fondos<div id="cierreFondo" class="texto-cierre"></div></button></td>
+    </tr>
+    
+    <tr>
+        <td style="padding-top: 5em"><button class="btn" id="btnCorreccionBoletos">Corrección Boletos<div id="correccionBoletos" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnMinuta">Minutas<div id="minuta" class="texto-cierre"></div></button></td>
+    </tr>
+
+    <tr>
+        <td style="padding-top: 5em"><button class="btn" id="btnCanje">CANJE LETES<div id="cierreCanje" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnCupon">CANJE DEUDA EXTRANJERA<div id="cierreCupon" class="texto-cierre"></div></button></td>
+    </tr>
+    
+    <tr>
+        <td style="padding-top: 5em"><button class="btn" id="btnCanjeLocalTardio">CANJE LOCAL TARDIO<div id="cierreCanjeLocalTardio" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnTreasuries">Treasuries<div id="cierreTreasuries" class="texto-cierre"></div></button></td>
+    </tr>
+    
+    <tr>
+        <td style="padding-top: 5em"><button class="btn" id="btnLetesPesos">Letes Pesos<div id="letesPesos" class="texto-cierre"></div></button></td>
+        <td style="padding-top: 5em"><button class="btn" id="btnLebacs">Lebad<div id="cierreLebac" class="texto-cierre"></div></button></td>
     </tr>
     
 </table>
@@ -61,24 +91,24 @@
 
         $.post('lebac/getCierreActual', function(cierre){
              if (cierre.cerrado){
-                 periodoCerrado();
+                 periodoCerradoLebac();
              } else {
                  var fechaCierre = moment(cierre.fechahora).format('YYYY/MM/DD HH:mm:ss');
-                 $('#cierreLebacs').countdown(fechaCierre, function(event) {
+                 $('#cierreLebac').countdown(fechaCierre, function(event) {
                  var $this = $(this).html(event.strftime(''
                     + 'Cierre en <span>%w</span> semanas <span>%d</span> días '
                     + '<span>%H</span> horas '
                     + '<span>%M</span> minutos '
                     + '<span>%S</span> segundos'));
                   });
-                  $('#cierreLebacs').on('finish.countdown', function(){
-                      periodoCerrado();
+                  $('#cierreLebac').on('finish.countdown', function(){
+                      periodoCerradoLebac();
                   });
              }
         }, 'json');
-
-        function periodoCerrado(){
-            $('#cierreLebacs').html('No hay licitaciones abiertas');
+        
+        function periodoCerradoLebac(){
+            $('#cierreLebac').html('No hay licitaciones abiertas');
         }
 
         $.post('letes/getCierreActual', function(cierre){
@@ -170,6 +200,56 @@
             $('#cierreCupon').html('No hay licitaciones abiertas');
         }
         
+        
+        
+        
+        $.post('canje/getCierreActual', function(cierre){
+             if (cierre.cerrado){
+                 periodoCerradoCanje();
+             } else {
+                 var fechaCierre = moment(cierre.fechahora).format('YYYY/MM/DD HH:mm:ss');
+                 $('#cierreCanje').countdown(fechaCierre, function(event) {
+                 var $this = $(this).html(event.strftime(''
+                    + 'Cierre en <span>%w</span> semanas <span>%d</span> días '
+                    + '<span>%H</span> horas '
+                    + '<span>%M</span> minutos '
+                    + '<span>%S</span> segundos'));
+                  });
+                  $('#cierreCanje').on('finish.countdown', function(){
+                      periodoCerradoCanje();
+                  });
+             }
+        }, 'json');
+        
+        function periodoCerradoCanje(){
+            $('#cierreCanje').html('No hay licitaciones abiertas');
+        }
+        
+        $.post('canjelocaltardio/getCierreActual', function(cierre){
+             if (cierre.cerrado){
+                 periodoCerradoCanjeLocalTardio();
+             } else {
+                 var fechaCierre = moment(cierre.fechahora).format('YYYY/MM/DD HH:mm:ss');
+                 $('#cierreCanjeLocalTardio').countdown(fechaCierre, function(event) {
+                 var $this = $(this).html(event.strftime(''
+                    + 'Cierre en <span>%w</span> semanas <span>%d</span> días '
+                    + '<span>%H</span> horas '
+                    + '<span>%M</span> minutos '
+                    + '<span>%S</span> segundos'));
+                  });
+                  $('#cierreCanjeLocalTardio').on('finish.countdown', function(){
+                      periodoCerradoCanjeLocalTardio();
+                  });
+             }
+        }, 'json');
+        
+        function periodoCerradoCanjeLocalTardio(){
+            $('#cierreCanjeLocalTardio').html('No hay licitaciones abiertas');
+        }        
+        
+        
+        
+        
         $.post('letesPesos/getCierreActual', function(cierre){
              if (cierre.cerrado){
                  periodoCerradoLetesPesos();
@@ -191,7 +271,30 @@
         function periodoCerradoLetesPesos(){
             $('#cierreLetesPesos').html('No hay licitaciones abiertas');
         }
+
+
+        $.post('treasuries/getCierreActual', function(cierre){
+             if (cierre.cerrado){
+                periodoCerradoTreasuries();
+             } else {
+                 var fechaCierre = moment(cierre.fechahora).format('YYYY/MM/DD HH:mm:ss');
+                 $('#cierreTreasuries').countdown(fechaCierre, function(event) {
+                 var $this = $(this).html(event.strftime(''
+                    + 'Cierre en <span>%w</span> semanas <span>%d</span> días '
+                    + '<span>%H</span> horas '
+                    + '<span>%M</span> minutos '
+                    + '<span>%S</span> segundos'));
+                  });
+                  $('#cierreTreasuries').on('finish.countdown', function(){
+                      periodoCerradoTreasuries();
+                  });
+             }
+        }, 'json');
         
+        function periodoCerradoTreasuries(){
+            $('#cierreTreasuries').html('No hay Treasuries abiertas');
+        }
+
         
         $("#btnLebacs").click(function(){
             $.redirect('/lebac');
@@ -209,8 +312,40 @@
             $.redirect('/cupon');
         });
         
+        $("#btnCanje").click(function(){
+            $.redirect('/canje');
+        });
+        
+        $("#btnCanjeLocalTardio").click(function(){
+            $.redirect('/canjelocaltardio');
+        });
+        
         $("#btnLetesPesos").click(function(){
             $.redirect('/letesPesos');
+        });
+        
+        $("#btnSenebi").click(function(){
+            $.redirect('/senebi');
+        });
+        
+        $("#btnFondo").click(function(){
+            $.redirect('/fondo');
+        });
+        
+        $("#btnCorreccionBoletos").click(function(){
+            $.redirect('/correccion');
+        });
+        
+        $("#btnMinuta").click(function(){
+            $.redirect('/minuta');
+        });
+        
+        $("#btnLetesPesos").click(function(){
+            $.redirect('/letesPesos');
+        });
+        
+        $("#btnTreasuries").click(function(){
+            $.redirect('/treasuries');
         });
         
     });

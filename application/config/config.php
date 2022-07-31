@@ -373,8 +373,7 @@ $config['proxy_ips'] = '';
 |
 | Place this code at the bottom of your application/config/config.php file.
 */
-function __autoload($class)
-{
+spl_autoload_register(function ($class) {
     if (strpos($class, 'CI_') !== 0)
     {
         if (file_exists($file = APPPATH . 'core/' . $class . EXT))
@@ -387,4 +386,4 @@ function __autoload($class)
             include $file;
         }
     }
-}
+});

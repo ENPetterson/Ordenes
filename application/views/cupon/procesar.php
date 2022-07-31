@@ -18,6 +18,8 @@
             async: false
         };
         var DACierre = new $.jqx.dataAdapter(srcCierre);
+
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
         
         $("#cierre").on('bindingComplete', function(event){
             $.post('/cupon/getCierreActual', function(cierre){
@@ -41,25 +43,33 @@
         });
 
         var source = {
-            datatype: "json",
-            datafields: [
+                datatype: "json",
+                datafields: [
                 { name: 'id'},
                 { name: 'numComitente', type: 'number'},
-                { name: 'comision', type: 'float'},
+//                { name: 'comision', type: 'float'},
                 { name: 'cantidad', type: 'number'},
-                { name: 'cantidadACrecer', type: 'number'},
-                { name: 'precio', type: 'float'},
-                { name: 'segundaParte', type: 'bool'},
-                { name: 'cantidadAcrecerSegunda', type: 'number'},
+                { name: 'arancel', type: 'float'},
+                { name: 'especie'},
+                { name: 'plazo'},
+                { name: 'tipo'},
+//                { name: 'bono'},
+//                { name: 'cantidadACrecer', type: 'number'},
+//                { name: 'precio', type: 'float'},
+//                { name: 'segundaParte', type: 'bool'},
+//                { name: 'cantidadAcrecerSegunda', type: 'number'},
                 { name: 'comitente'},
                 { name: 'tipoPersona'},
                 { name: 'oficial'},
                 { name: 'usuario'},
                 { name: 'cuit', type: 'number'},
+                { name: 'posicion'},
                 { name: 'estado'},
                 { name: 'estado_id'},
-                { name: 'envio'},
-                { name: 'fhenvio', type: 'date', format: 'yyyy-MM-dd HH:mm:ss'}
+//                { name: 'envio'},
+                { name: 'fhenvio', type: 'date', format: 'yyyy-MM-dd'},
+//                { name: 'fhmodificacion', type: 'date', format: 'yyyy-MM-dd'},
+                { name: 'estaConfirmado'}
             ],
             cache: false,
             url: '/cupon/procesarGrilla',
@@ -87,23 +97,30 @@
                 width: 1810,
                 height: 400,
                 columns: [
-                        { text: 'Id', datafield: 'id', width: 80, cellsalign: 'right', cellsformat: 'd', aggregates: ['count'] },
+                        { text: 'Id', datafield: 'id', width: 40, cellsalign: 'right', cellsformat: 'd', aggregates: ['count'] },
                         { text: 'Nro Comitente', datafield: 'numComitente', width: 70},
-                        { text: 'Comis', datafield: 'comision', width: 60, cellsalign: 'right', cellsformat: 'd4'},
-                        { text: 'Cantidad', datafield: 'cantidad', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum'] },
-                        { text: 'Cant A Crecer', datafield: 'cantidadACrecer', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum'] },
-                        { text: 'Precio', datafield: 'precio', width: 100, cellsalign: 'right', cellsformat: 'd10'},
-                        { text: 'Segund', datafield: 'segundaParte', width: 30, columntype: 'checkbox'},
-                        { text: 'Cant A Crec 2da', datafield: 'cantidadAcrecerSegunda', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum'] },
+//                        { text: 'Comis', datafield: 'comision', width: 60, cellsalign: 'right', cellsformat: 'd4'},
+                        { text: 'Cantidad', datafield: 'cantidad', width: 90, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum'] },
+                        { text: 'Arancel', datafield: 'arancel', width: 70, cellsalign: 'right', cellsformat: 'd4'},
+                        { text: 'Especie', datafield: 'especie', width: 90},
+                        { text: 'Código', datafield: 'plazo', width: 90},
+                        { text: 'CVSA', datafield: 'tipo', width: 90},
+//                        { text: 'Bono', datafield: 'bono', width: 60},
+//                        { text: 'Cant A Crecer', datafield: 'cantidadACrecer', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum'] },
+//                        { text: 'Precio', datafield: 'precio', width: 100, cellsalign: 'right', cellsformat: 'd10'},
+//                        { text: 'Segund', datafield: 'segundaParte', width: 30, columntype: 'checkbox'},
+//                        { text: 'Cant A Crec 2da', datafield: 'cantidadAcrecerSegunda', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum'] },
                         { text: 'Comitente', datafield: 'comitente', width: 200},
                         { text: 'Tipo Per', datafield: 'tipoPersona', width: 80},
                         { text: 'Oficial', datafield: 'oficial', width: 200},
                         { text: 'Usuario', datafield: 'usuario', width: 150},
                         { text: 'CUIT', datafield: 'cuit', width: 100},
+                        { text: 'Posicion', datafield: 'posicion', width: 100},
                         { text: 'Estado', datafield: 'estado', width: 90},
                         { text: 'estado_id', datafield: 'estado_id', width: 0, hidden: true},
-                        { text: 'Inst', datafield: 'envio', width: 30},
-                        { text: 'Envio', datafield: 'fhenvio', width: 150, cellsformat: 'dd/MM/yyyy HH:mm:ss'}
+//                        { text: 'Inst', datafield: 'envio', width: 30},
+                        { text: 'Inst', datafield: 'fhenvio', width: 80, cellsformat: 'dd/MM/yyyy HH:mm:ss'},
+                        { text: 'WEB', datafield: 'estaConfirmado', width: 30, columntype: 'checkbox'}
                 ]
         });
         $("#grilla").on("bindingcomplete", function (event){
@@ -325,6 +342,9 @@
     });
 </script>
 <div id="cierre"></div>
+<br>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Procesar Cupones</ul></div>
+<br>
 <br>
 <div id="grilla"></div>
 <div id="botonera">

@@ -141,7 +141,6 @@ class LetesPesos_model extends CI_Model{
     
     
     public function getCierre(){
-        
         $cierreBean = R::load('cierreletespesos', $this->cierreletespesos_id);
         $cierre = $cierreBean->export();
         $sql = "select * from plazoletespesos where cierreletespesos_id = ? order by moneda, plazo";
@@ -205,6 +204,19 @@ class LetesPesos_model extends CI_Model{
         }
         return $plazos;
     }
+    
+    public function getPlazosEspecie(){
+        if ($this->cierreletespesos_id > 0){
+            $sql = "select plazo, especie from plazoletespesos where cierreletespesos_id = ? and moneda = ? order by plazo";
+            $plazos = R::getAll($sql, array($this->cierreletespesos_id, $this->moneda));
+        } else {
+            $sql = "select plazo, especie from plazoletespesos where moneda = ? and cierreletespesos_id = (SELECT id FROM cierreletespesos where fechahora > NOW() order by fechahora limit 0,1) order by plazo";
+            $plazos = R::getAll($sql, array($this->moneda));
+        }
+        
+        return $plazos;
+    }
+    
     
     public function getMonedas(){
         if ($this->cierreletespesos_id > 0){
@@ -354,40 +366,111 @@ class LetesPesos_model extends CI_Model{
         $contenidoInd = 0;
         foreach ($resultado as $indice=>$fila){
             $plazo = R::findOne('plazoletespesos', 'cierreletespesos_id = ? and moneda = ? and plazo = ?', array($fila['cierreletespesos_id'], $fila['moneda'], $fila['plazo']));            
-            /*
-            if ($fila['tramo'] == 'Competitiva'){
-                $titulo = $plazo->tituloC;
-                $precio = $fila['precio'];
-            } else {
-                $precio = '';
-                if ($fila['tipopersona'] == 'JURIDICA'){
-                    $titulo = $plazo->tituloNCJ;
-                } else {
-                    $titulo = $plazo->tituloNCF;
-                }
-            }
-            */
+            
             switch ($fila['moneda']){
                 case '$':
                     if ($fila['tramo'] == 'Competitiva'){
-                        $titulo = utf8_decode('LECAPs a 80 dias en Pesos Vto 19/07/2019  - Int Pesos - Tramo Competitivo');
+                        $titulo = $plazo->tituloC;
                         $precio = $fila['precio'];
                     } else {
-                        $titulo = utf8_decode('LECAPs a 80 dias en Pesos Vto 19/07/2019  - Int Pesos - Tramo NO Competitivo');
+                        if ($fila['tipopersona'] == 'JURIDICA'){
+                            $titulo = $plazo->tituloNCJ;
+                        } else {
+                            $titulo = $plazo->tituloNCF;
+                        }
+                        $precio = '';
+                    }
+                    break;
+                case 'u$s':   
+                    //...
+                break;
+            }
+            
+            /*
+            switch ($fila['moneda']){
+                case '$':
+                    if ($fila['tramo'] == 'Competitiva'){
+                        $titulo = utf8_decode('LECAPs a 49 dias en Pesos Vto 28/06/2019  - Int Pesos - Tramo Competitivo');
+                        $precio = $fila['precio'];
+                    } else {
+                        $titulo = utf8_decode('LECAPs a 49 dias en Pesos Vto 28/06/2019  - Int Pesos - Tramo NO Competitivo');
                         $precio = '';
                     }
                     break;
 
                 case 'u$s':
                     if ($fila['tramo'] == 'Competitiva'){
-                        $titulo = utf8_decode('LECAPs a 80 dias en Pesos Vto 19/07/2019  - Int Dolares - Tramo Competitivo');
+                        $titulo = utf8_decode('LECAPs a 49 dias en Pesos Vto 28/06/2019  - Int Dolares - Tramo Competitivo');
                         $precio = $fila['precio'];
                     } else {
-                        $titulo = utf8_decode('LECAPs a 80 dias en Pesos Vto 19/07/2019  - Int Dolares - Tramo NO Competitivo');
+                        $titulo = utf8_decode('LECAPs a 49 dias en Pesos Vto 28/06/2019  - Int Dolares - Tramo NO Competitivo');
                         $precio = '';
                     }
                     break;
             }
+            */
+             
+            
+            /*
+            switch ($fila['moneda']){
+                case '$': //Todos tendrían que entrar por pesos.
+                    if ($fila['tramo'] == 'Competitiva'){
+                        switch ($fila['plazo']){ //Acá vá el competitivo
+                            case '180 Pesos C.E.R':
+                                $titulo = utf8_decode("TX21 - Bonos del Tesoro Nacional en Pesos con Ajuste por C.E.R. 1% vencimiento 2021");
+                                break;
+                            case '180 Pesos BADLAR':
+                                $titulo = utf8_decode("TB21 - Bonos del Tesoro Nacional en Pesos BADLAR Privada + 100 pbs. vencimiento 2021");
+                                break;
+                            case '180 Vinculados Dolar':
+                                $titulo = utf8_decode("TV21 - Bonos del Tesoro Nacional Vinculados al Dólar 4% vencimiento 2021");
+                                break;
+                        }
+                        $precio = $fila['precio'];
+                    } else {                      //Acá vá el NO competitivo
+                        
+                        switch ($fila['plazo']){
+                            case '180 Pesos C.E.R':
+                                $titulo = utf8_decode("TX21 - Bonos del Tesoro Nacional en Pesos con Ajuste por C.E.R. 1% vencimiento 2021");
+                                break;
+                            case '180 Pesos BADLAR':
+                                $titulo = utf8_decode("TB21 - Bonos del Tesoro Nacional en Pesos BADLAR Privada + 100 pbs. vencimiento 2021");
+                                break;
+                            case '180 Vinculados Dolar':
+                                $titulo = utf8_decode("TV21 - Bonos del Tesoro Nacional Vinculados al Dólar 4% vencimiento 2021");
+                                break;
+                        }
+                        $precio = '';
+ 
+                    }
+                    break;
+
+//                case 'u$s':
+//                    if ($fila['tramo'] == 'Competitiva'){
+//                        switch ($fila['plazo']){
+//                            case 35:
+//                                $titulo = utf8_decode("LECAPs a 35 dias en Pesos Vto 04/10/2019  - Int Dolares - Tramo Competitivo");
+//                                break;
+//                            case 315:
+//                                $titulo = utf8_decode("LECAPs a 315 dias en Pesos Vto 29/05/2020 - Int Dolares - Tramo Competitivo");
+//                                break;
+//                        }
+//                        $precio = $fila['precio'];
+//                    } else {
+//                        switch ($fila['plazo']){
+//                            case 35:
+//                                $titulo = utf8_decode("LECAPs a 35 dias en Pesos Vto 04/10/2019  - Int Dolares - Tramo NO Competitivo");
+//                                break;
+//                            case 315:
+//                                $titulo = utf8_decode("LECAPs a 315 dias en Pesos Vto 29/05/2020  - Int Dolares - Tramo NO Competitivo");
+//                                break;
+//                        }
+//                        $precio = '';
+//                    }
+//                    break;
+            } // Fin switch
+            
+            */
             
             if ($fila['tipopersona'] == 'FISICA'){
                 $tipoPersona = 'Persona Fisica';

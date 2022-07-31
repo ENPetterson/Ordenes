@@ -200,11 +200,21 @@ class Bono extends MY_AuthController {
         $this->load->view('template/pie');
     }
     
-    public function getCierreActual($cierreId){
+//    public function getCierreActual($cierreId){
+//        
+//        print_r($cierreActual); die;
+//        
+//        $this->load->model('Bono_model');
+//        $cierreActual = $this->Bono_model->getCierreActual($cierreId);
+//        echo json_encode($cierreActual);
+//    }
+    
+    public function getCierreActual(){
         $this->load->model('Bono_model');
-        $cierreActual = $this->Bono_model->getCierreActual($cierreId);
+        $cierreActual = $this->Bono_model->getCierreActual();
         echo json_encode($cierreActual);
     }
+    
 
     public function procesar(){
         $this->load->view('template/encabezado');

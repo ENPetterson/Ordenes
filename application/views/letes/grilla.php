@@ -26,6 +26,8 @@
                 }
             },'json');
         });
+
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
         
         $("#cierre").jqxDropDownList({ selectedIndex: -1, source: DACierre, displayMember: "fechahora", 
             valueMember: "id", width: 200, height: 25, theme: theme, placeHolder: "Elija el cierre:", renderer: function (index, label, value){
@@ -204,6 +206,9 @@
     });
 </script>
 <div id="cierre"></div>
+<br>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Grilla letes</ul></div>
+<br>
 <br>
 <div id="grilla"></div>
 <div id="botonera">

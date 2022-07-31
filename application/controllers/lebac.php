@@ -15,6 +15,7 @@ class Lebac extends MY_AuthController {
     public function editar(){
         $datos['id'] = $this->input->post('id');
         $datos['origen'] = $this->input->post('origen');
+        $datos['cierre'] = $this->input->post('cierre');
         $this->load->view('template/encabezado');
         $this->load->view('template/menu');
         $this->load->view('lebac/editar', $datos);
@@ -53,6 +54,15 @@ class Lebac extends MY_AuthController {
         $this->Lebac_model->delOrden();
         echo json_encode(array('resultado'=>'Ordenes borradas exitosamente'));
     }
+    
+    public function comprobarEstadoCierre(){
+        $cierre = $this->input->post('cierre');
+        $this->load->model('Lebac_model');
+        $this->Lebac_model->cierre = $cierre;
+        $resultado = $this->Lebac_model->comprobarEstadoCierre();
+        echo json_encode($resultado);
+    }
+    
     
     public function grilla(){
         
@@ -126,12 +136,14 @@ class Lebac extends MY_AuthController {
         $plazos = $this->input->post('plazos');
         $plazosBorrar = $this->input->post('plazosBorrar');
         $instrumento = $this->input->post('instrumento');
+        $pausarCierre = $this->input->post('pausarCierre');
         $this->load->model('Lebac_model');
         $this->Lebac_model->cierre_id = $cierre_id;
         $this->Lebac_model->fechahora = $fechaHora;
         $this->Lebac_model->plazos = $plazos;
         $this->Lebac_model->plazosBorrar = $plazosBorrar;
         $this->Lebac_model->instrumento = $instrumento;
+        $this->Lebac_model->pausarCierre = $pausarCierre;
         $cierre = $this->Lebac_model->saveCierre();
         echo json_encode($cierre);
     }
@@ -194,6 +206,24 @@ class Lebac extends MY_AuthController {
         $cierreActual = $this->Lebac_model->getCierreActual();
         echo json_encode($cierreActual);
     }
+    
+    public function getPrecioMinimoPlazo(){
+        
+        $tramo = $this->input->post('tramo');
+        $plazo = $this->input->post('plazo');   
+        $cierre = $this->input->post('cierre');        
+        
+        $this->load->model('Lebac_model');
+        
+        $this->Lebac_model->tramo = $tramo;
+        $this->Lebac_model->plazo = $plazo;
+        $this->Lebac_model->cierre = $cierre;
+        
+        $minimo = $this->Lebac_model->getPrecioMinimoPlazo();
+        echo json_encode($minimo);
+    }
+    
+    
 
     public function procesar(){
         $this->load->view('template/encabezado');
@@ -274,7 +304,24 @@ class Lebac extends MY_AuthController {
         echo json_encode($resultado);
     }
     
-    
+    public function previewTxt(){
+        $ordenes = $this->input->post('ordenes');
+        $this->load->model('Lebac_model');
+        $this->Lebac_model->ordenes = $ordenes;
+        $resultado = $this->Lebac_model->previewTxt();
+        echo json_encode($resultado);
+    }
+
+    public function generarTxt(){
+        $ordenes = $this->input->post('ordenes');
+        $this->load->model('Lebac_model');
+        $this->Lebac_model->ordenes = $ordenes;
+        $resultado = $this->Lebac_model->generarTxt();
+        echo json_encode($resultado);
+    }
+
+
+
     
     public function grabarExcel(){
         

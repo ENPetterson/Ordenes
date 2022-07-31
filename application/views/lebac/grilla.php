@@ -25,6 +25,8 @@ $timestamp = time();
             async: false
         };
         var DACierre = new $.jqx.dataAdapter(srcCierre);
+
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
         
         $("#cierre").on('bindingComplete', function(event){
             $.post('/lebac/getCierreActual', function(cierre){
@@ -119,11 +121,11 @@ $timestamp = time();
         $("#enviarButton").jqxButton({ width: '160', theme: theme, disabled: true });
         
         $("#nuevoButton").click(function(){
-            $.redirect('/lebac/editar', {'id': 0, origen: 'lebac'});
+            $.redirect('/lebac/editar', {'id': 0, origen: 'lebac', cierre: $("#cierre").jqxDropDownList('getSelectedItem').value});
         });
         
         $("#editarButton").click(function(){
-            $.redirect('/lebac/editar', {'id': id, origen: 'lebac'});
+            $.redirect('/lebac/editar', {'id': id, origen: 'lebac', cierre: $("#cierre").jqxDropDownList('getSelectedItem').value});
         });
         
         $("#borrarButton").click(function(){
@@ -149,31 +151,54 @@ $timestamp = time();
         });
         
         $("#enviarButton").click(function(){
-            new Messi('Desea enviar las ordenes seleccionadas ?' , {title: 'Confirmar',titleClass: 'warning', modal: true,
-                buttons: [{id: 0, label: 'Si', val: 's'}, {id: 1, label: 'No', val: 'n'}], callback: function(val) { 
-                    if (val == 's'){
-                        datos = {
-                            ordenes: enviar
-                        };
-                        $.post('/lebac/enviarOrdenes', datos, function(data){
-                            var titleClass;
-                            if (data.exito == 0){
-                                titleClass = 'error';
-                            } else {
-                                titleClass = 'success';
+            
+            datos = {
+                cierre: $("#cierre").val()
+            };  
+            
+            $.post('/lebac/comprobarEstadoCierre', datos, function(data){
+                if(data == 'true'){
+                    var titleClass;
+                    titleClass = 'success';
+                    new Messi('En mantenimiento', {title: 'Mensaje', modal: true,
+                    buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass});
+                }else{
+                    new Messi('Desea enviar las ordenes seleccionadas ?' , {title: 'Confirmar',titleClass: 'warning', modal: true,
+                        buttons: [{id: 0, label: 'Si', val: 's'}, {id: 1, label: 'No', val: 'n'}], callback: function(val) { 
+                            if (val == 's'){
+                                datos = {
+                                    ordenes: enviar
+                                };
+                                $.post('/lebac/enviarOrdenes', datos, function(data){
+                                    var titleClass;
+                                    if (data.exito == 0){
+                                        titleClass = 'error';
+                                    } else {
+                                        titleClass = 'success';
+                                    }
+                                    new Messi(data.resultado, {title: 'Mensaje', modal: true,
+                                        buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass});
+                                    $('#grilla').jqxGrid('updatebounddata');
+                                    $('#editarButton').jqxButton({disabled: true });
+                                    $('#borrarButton').jqxButton({disabled: true });
+                                    $('#enviarButton').jqxButton({disabled: true });
+                                    $('#grilla').jqxGrid('clearselection');
+                                }
+                                , 'json');
                             }
-                            new Messi(data.resultado, {title: 'Mensaje', modal: true,
-                                buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass});
-                            $('#grilla').jqxGrid('updatebounddata');
-                            $('#editarButton').jqxButton({disabled: true });
-                            $('#borrarButton').jqxButton({disabled: true });
-                            $('#enviarButton').jqxButton({disabled: true });
-                            $('#grilla').jqxGrid('clearselection');
                         }
-                        , 'json');
-                    } 
+                    });
                 }
-            });
+            }
+            , 'json');
+            
+            
+            
+            
+            /*
+            
+            */
+    
         });
         
         
@@ -250,6 +275,9 @@ $timestamp = time();
     });
 </script>
 <div id="cierre"></div>
+<br>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Grilla Lecer</ul></div>
+<br>
 <br>
 <div id="grilla"></div>
 <div id="botonera">

@@ -39,7 +39,7 @@ class Lebac_model extends CI_Model{
         if ($orden->id == 0 ){
             $estadoorden = R::load('estadoorden', 1);
             $cierreActual = $this->getCierreActual();
-            if ($cierreActual['cerrado']){
+            if (isset($cierreActual['cerrado'])){
                 return array('id'=>0);
             } else {
                 $cierre = R::load('cierre', $cierreActual['id']);
@@ -66,7 +66,7 @@ class Lebac_model extends CI_Model{
     }
     
     public function getOrden(){
-        $orden = R::load('lebac', $this->id);
+        $orden = R::load('lebac', $this->id);        
         return $orden->export();
     }
     
@@ -150,9 +150,12 @@ class Lebac_model extends CI_Model{
     }
     
     public function saveCierre(){
+                
         $cierre = R::load('cierre', $this->cierre_id);
         $cierre->fechahora = $this->fechahora;
-        $cierre->instrumento = $this->instrumento;
+        $cierre->instrumento = $this->instrumento;        
+        $cierre->pausarCierre = $this->pausarCierre;        
+        
         R::store($cierre);
         
         foreach ((array) $this->plazos as $plazoItem) {
@@ -161,6 +164,7 @@ class Lebac_model extends CI_Model{
             $plazo->plazo = $plazoItem['plazo'];
             $plazo->especie = $plazoItem['especie'];
             $plazo->colocacion = $plazoItem['colocacion'];
+            $plazo->precioMinimoC = (float)$plazoItem['precioMinimoC'];
             $plazo->tituloC = $plazoItem['tituloC'];
             $plazo->tituloNCJ = $plazoItem['tituloNCJ'];
             $plazo->tituloNCF = $plazoItem['tituloNCF'];
@@ -179,37 +183,35 @@ class Lebac_model extends CI_Model{
         
         R::exec('delete from tenencialebac where cierre_id = ?', array($cierre->id));
         
-        $this->load->model('Esco_model');
-        $this->Esco_model->instrumento = $this->instrumento;
-        $posicionesLebac = $this->Esco_model->getPosicionLebacs();
-        foreach ($posicionesLebac as $posicion) {
-            $tenenciaLebac = R::dispense('tenencialebac');
-            $tenenciaLebac->numComitente = $posicion['NumComitente'];
-            $tenenciaLebac->cantidad = $posicion['Cantidad'];
-            $tenenciaLebac->cierre = $cierre;
-            R::store($tenenciaLebac);
-        }
+        //$this->load->model('Esco_model');
+        //$this->Esco_model->instrumento = $this->instrumento;
+        //$posicionesLebac = $this->Esco_model->getPosicionLebacs();
+        //foreach ($posicionesLebac as $posicion) {
+        //    $tenenciaLebac = R::dispense('tenencialebac');
+        //    $tenenciaLebac->numComitente = $posicion['NumComitente'];
+        //    $tenenciaLebac->cantidad = $posicion['Cantidad'];
+        //    $tenenciaLebac->cierre = $cierre;
+        //    R::store($tenenciaLebac);
+        //}
         
         return $cierre->export();
     }
     
     public function actualizarPosicionMonetaria(){
-        R::exec('truncate table posicionmonetaria');
-        $this->load->model('Esco_model');
-        $posiciones = $this->Esco_model->getPosicionMonetaria();
-        foreach ($posiciones as $posicion){
-            $posicionMonetaria = R::dispense('posicionmonetaria');
-            $posicionMonetaria->numComitente = $posicion['NumComitente'];
-            $posicionMonetaria->saldo = $posicion['SaldoDisponible'];
-            R::store($posicionMonetaria);
-        }
+        //R::exec('truncate table posicionmonetaria');
+        //$this->load->model('Esco_model');
+        //$posiciones = $this->Esco_model->getPosicionMonetaria();
+        //foreach ($posiciones as $posicion){
+        //    $posicionMonetaria = R::dispense('posicionmonetaria');
+        //    $posicionMonetaria->numComitente = $posicion['NumComitente'];
+        //    $posicionMonetaria->saldo = $posicion['SaldoDisponible'];
+        //    R::store($posicionMonetaria);
+        //}
     }
     
     
     
     public function delCierre(){
-        $plazos = R::find('plazo', array($this->cierre_id));
-        R::trashAll($plazos);
         $cierre = R::load('cierre', $this->cierre_id);
         R::trash($cierre);
     }
@@ -224,6 +226,33 @@ class Lebac_model extends CI_Model{
             return $cierre;
         }
     }
+    
+    
+    public function comprobarEstadoCierre(){
+        
+        $sql = "SELECT pausarCierre FROM cierre where id = ?";
+        $cierre = R::getRow($sql, array($this->cierre));
+        $result = $cierre['pausarCierre'];
+                
+        return $result;
+    }
+    
+    
+    public function getPrecioMinimoPlazo(){
+        if ($this->tramo == 'Competitiva'){
+            $sql = "SELECT precioMinimoC FROM plazo where cierre_id = ? and plazo = ? order by plazo";
+            $minimo = R::getRow($sql, array($this->cierre, $this->plazo));
+            $result = $minimo['precioMinimoC'];
+        }
+        else {
+            $sql = "SELECT precioMinimoNC FROM plazo where cierre_id = ? and plazo = ? order by plazo";
+            $minimo = R::getRow($sql, array($this->cierre, $this->plazo));
+            $result = $minimo['precioMinimoNC'];
+        }
+        
+        return $result;
+    }
+    
     
     public function getPlazos(){
         if ($this->cierre_id > 0){
@@ -433,28 +462,111 @@ class Lebac_model extends CI_Model{
             }
             */
             
-            switch ($fila['moneda']){
-                case '$':
-                    if ($fila['tramo'] == 'Competitiva'){
-                        $titulo = utf8_decode('LECER en Pesos 122 dias  Vto. 30/08/2019 Tramo Competitivo - Integración Pesos');
-                        $precio = $fila['precio'];
-                    } else {
-                        $titulo = utf8_decode('LECER en Pesos 122 dias  Vto. 30/08/2019 Tramo NO Competitivo - Integración Pesos');
-                        $precio = '';
-                    }
-                    break;
-
-                case 'u$s':
-                    if ($fila['tramo'] == 'Competitiva'){
-                        $titulo = utf8_decode('LECER en Pesos 122 dias  Vto. 30/08/2019 Tramo Competitivo - Integración Dolares');
-                        $precio = $fila['precio'];
-                    } else {
-                        $titulo = utf8_decode('LECER en Pesos 122 dias  Vto. 30/08/2019 Tramo NO Competitivo - Integración Dolares');
-                        $precio = '';
-                    }
-                    break;
-            }
+//            switch ($fila['moneda']){
+//                case '$':
+//                    if ($fila['tramo'] == 'Competitiva'){
+//                        $titulo = utf8_decode('LECER en Pesos 91 dias  Vto. 30/08/2019 Tramo Competitivo - Integración Pesos');
+//                        $precio = $fila['precio'];
+//                    } else {
+//                        $titulo = utf8_decode('LECER en Pesos 91 dias  Vto. 30/08/2019 Tramo NO Competitivo - Integración Pesos');
+//                        $precio = '';
+//                    }
+//                    break;
+//
+//                case 'u$s':
+//                    if ($fila['tramo'] == 'Competitiva'){
+//                        $titulo = utf8_decode('LECER en Pesos 91 dias  Vto. 30/08/2019 Tramo Competitivo - Integración Dolares');
+//                        $precio = $fila['precio'];
+//                    } else {
+//                        $titulo = utf8_decode('LECER en Pesos 91 dias  Vto. 30/08/2019 Tramo NO Competitivo - Integración Dolares');
+//                        $precio = '';
+//                    }
+//                    break;
+//            }
+//            echo "<pre>";
+//            print_r($fila);
+//            echo "<pre>";
+//            
+//            echo "<pre>";
+//            print_r($plazo);
+//            echo "<pre>";
+//            die;
             
+            $titulo = '';
+            
+            switch ($fila['moneda']){
+                case '$': //Todos tendrían que entrar por pesos.
+                    if ($fila['tramo'] == 'Competitiva'){
+                        
+                        
+                        
+                        $sql = "select *
+                            from   plazo
+                            where  id = ?
+                            ";
+                        $result = R::getRow($sql, array($plazo['id']));
+                        
+                        $titulo = $result['tituloC'];
+//                                    echo "<pre>";
+//                                    print_r($titulo['tituloC']);
+//                                    echo "<pre>";
+//                                    die;
+
+                        
+//                        switch ($fila['plazo']){ //Acá vá el competitivo
+//                            case '60':
+//                                $titulo = utf8_decode("LETRAS DEL TESORO EN PESOS A DESCUENTO Vto. 16 de junio de 2020 (reapertura) - Tramo Competitivo");
+//                                break;
+//                            case '364':
+//                                $titulo = utf8_decode("BONOS DEL TESORO EN PESOS AJUSTADOS POR CER 1,10% Vto. 17 de abril 2021 “BONCER” - Tramo Competitivo");
+//                                break;
+//                        }
+                        $precio = $fila['precio'];
+                    } else {                      //Acá vá el NO competitivo
+                        $sql = "select *
+                            from   plazo
+                            where  id = ?
+                            ";
+                        $result = R::getRow($sql, array($plazo['id']));
+                        
+                        $titulo = $result['tituloNCJ'];
+//                        switch ($fila['plazo']){ //Acá vá el no competitivo
+//                            case '60':
+//                                $titulo = utf8_decode("LETRAS DEL TESORO EN PESOS A DESCUENTO Vto. 16 de junio de 2020 (reapertura) - Tramo No Competitivo");
+//                                break;
+//                            case '364':
+//                                $titulo = utf8_decode("BONOS DEL TESORO EN PESOS AJUSTADOS POR CER 1,10% Vto. 17 de abril 2021 “BONCER” - Tramo No Competitivo");
+//                                break;
+//                            
+//                        }
+                        $precio = '';
+
+                    }
+                    break;
+//                case 'u$s':
+//                    if ($fila['tramo'] == 'Competitiva'){
+//                        switch ($fila['plazo']){
+//                            case 35:
+//                                $titulo = utf8_decode("LECAPs a 35 dias en Pesos Vto 04/10/2019  - Int Dolares - Tramo Competitivo");
+//                                break;
+//                            case 315:
+//                                $titulo = utf8_decode("LECAPs a 315 dias en Pesos Vto 29/05/2020 - Int Dolares - Tramo Competitivo");
+//                                break;
+//                        }
+//                        $precio = $fila['precio'];
+//                    } else {
+//                        switch ($fila['plazo']){
+//                            case 35:
+//                                $titulo = utf8_decode("LECAPs a 35 dias en Pesos Vto 04/10/2019  - Int Dolares - Tramo NO Competitivo");
+//                                break;
+//                            case 315:
+//                                $titulo = utf8_decode("LECAPs a 315 dias en Pesos Vto 29/05/2020  - Int Dolares - Tramo NO Competitivo");
+//                                break;
+//                        }
+//                        $precio = '';
+//                    }
+//                    break;
+            }
             
             
             $colocacion = $plazo->colocacion;
@@ -473,7 +585,91 @@ class Lebac_model extends CI_Model{
                 $tipoPersona = 'Persona Juridica';
             }
             
+            $contenido[$contenidoInd]['colocacion'] = $colocacion;
+            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t\t" . $fila['cuit']  . "\t\t\t\t" . $tipoPersona .  "\t\t\tCUIT\r\n";
             
+        }
+        $this->load->library('zip');
+        foreach ($contenido as $data){
+            //$archivo = FCPATH . 'generadas/' . date('Y-m-d-H-i-s') . '-' . $data['colocacion'] . '-lebacs.dat';
+            $archivo = date('Y-m-d-H-i-s') . '-' . $data['colocacion'] . '-lebacs.txt';
+            $this->zip->add_data($archivo, $data['datos']);
+            //file_put_contents($archivo, $data['datos']);
+            //array_push($uris, base_url() . 'generadas/' . basename($archivo));
+        }
+        $nombreZip = FCPATH . 'generadas/' . date('Y-m-d-H-i-s') . '-lebacs.zip';
+        $this->zip->archive($nombreZip);
+        
+        return array('uris'=>array(base_url() . 'generadas/' . basename($nombreZip)));
+    }
+
+        public function previewTxt(){
+        $ordenes_in = implode(',', $this->ordenes);
+        $sql = "SELECT  cierre_id,
+                        tramo,
+                        moneda, 
+                        tipopersona,
+                        plazo, 
+                        numcomitente,
+                        cantidad,
+                        precio,
+                        cuit,
+                        comision
+                        FROM    lebac
+                WHERE   id in ({$ordenes_in})
+                ORDER BY cierre_id, moneda, plazo ";
+        $resultado = R::getAll($sql);
+        
+        $colocacionAnterior = 0;
+        $contenidoInd = 0;
+        foreach ($resultado as $indice=>$fila){
+            $plazo = R::findOne('plazo', 'cierre_id = ? and moneda = ? and plazo = ?', array($fila['cierre_id'], $fila['moneda'], $fila['plazo']));
+            $titulo = '';
+            
+            switch ($fila['moneda']){
+                case '$': //Todos tendrían que entrar por pesos.
+                    if ($fila['tramo'] == 'Competitiva'){
+                        
+                        
+                        
+                        $sql = "select *
+                            from   plazo
+                            where  id = ?
+                            ";
+                        $result = R::getRow($sql, array($plazo['id']));
+                        
+                        $titulo = $result['tituloC'];
+                        $precio = $fila['precio'];
+                    } else {                      //Acá vá el NO competitivo
+                        $sql = "select *
+                            from   plazo
+                            where  id = ?
+                            ";
+                        $result = R::getRow($sql, array($plazo['id']));
+                        
+                        $titulo = $result['tituloNCJ'];
+                        $precio = '';
+
+                    }
+                    break;
+            }
+            
+            
+            $colocacion = $plazo->colocacion;
+            if ($indice == 0){
+                $colocacionAnterior = $colocacion;
+            }
+            
+            if ($colocacion <> $colocacionAnterior){
+                $contenidoInd++;
+                $colocacionAnterior = $colocacion;
+            }
+            
+            if ($fila['tipopersona'] == 'FISICA'){
+                $tipoPersona = 'Persona Fisica';
+            } else {
+                $tipoPersona = 'Persona Juridica';
+            }
             
             $contenido[$contenidoInd]['colocacion'] = $colocacion;
             $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t\t" . $fila['cuit']  . "\t\t\t\t" . $tipoPersona .  "\t\t\tCUIT\r\n";
@@ -492,6 +688,7 @@ class Lebac_model extends CI_Model{
         
         return array('uris'=>array(base_url() . 'generadas/' . basename($nombreZip)));
     }
+ 
     
     public function enviarMercado(){        
         $estado = R::load('estadoorden', 3);
@@ -505,6 +702,20 @@ class Lebac_model extends CI_Model{
         }
         return $resultado;
     }
+
+    public function generarTxt(){        
+        $estado = R::load('estadoorden', 3);
+        $resultado = array('exito'=>1, 'resultado'=>'Ordenes Enviadas Correctamente');
+        foreach ($this->ordenes as $id) {
+            $orden = R::load('lebac', $id);
+            $orden->estado = $estado;
+            $orden->envio = 'M';
+            $orden->fhenvio = R::isoDateTime();
+            R::store($orden);
+        }
+        return $resultado;
+    }
+
 
     
     public function formatearCuit($cuit){

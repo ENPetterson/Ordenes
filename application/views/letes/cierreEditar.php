@@ -18,10 +18,10 @@
                     <td style="padding-right:10px; padding-bottom: 10px">Minimos (separados por coma): </td>
                     <td><input type="text" id="minimos" style="width: 250px; text-transform: uppercase"></td>
                 </tr>
-                <tr>
+<!--                <tr>
                     <td style="padding-right:10px; padding-bottom: 10px">Colocacion $: </td>
                     <td><div id="colocacionPesos"></div></td>
-                </tr>
+                </tr>-->
                 <tr>
                     <td style="padding-right:10px; padding-bottom: 10px">Colocacion u$s: </td>
                     <td><div id="colocacionDolares"></div></td>
@@ -36,6 +36,10 @@
                     <td><div id="colocacionLebacsDic"></div></td>
                 </tr>
                 -->
+<!--                <tr>
+                    <td style="padding-right:10px; padding-bottom: 10px">Colocacion A2J9: </td>
+                    <td><div id="colocacionA2J9"></div></td>
+                </tr>-->
                 <tr>
                     <td colspan="2" style="text-align: center; padding-top: 1em">
                         <input type="button" id="aceptarButton" value="Aceptar">
@@ -55,12 +59,16 @@
         $("#fechaHora").jqxDateTimeInput({ formatString: "dd/MM/yyyy HH:mm", showTimeButton: true, width: '250px', height: '25px', theme: theme });
         $("#plazos").jqxInput({theme: theme, height: '25px', width: '250px' });
         $("#minimos").jqxInput({theme: theme, height: '25px', width: '250px' });
-        $("#colocacionPesos").jqxNumberInput({ width: '250px', height: '25px', theme:theme, digits:6, decimalDigits: 0});
         $("#colocacionDolares").jqxNumberInput({ width: '250px', height: '25px', theme:theme, digits:6, decimalDigits: 0});
         /*
         $("#colocacionLebacsNov").jqxNumberInput({ width: '250px', height: '25px', theme:theme, digits:6, decimalDigits: 0});
         $("#colocacionLebacsDic").jqxNumberInput({ width: '250px', height: '25px', theme:theme, digits:6, decimalDigits: 0});
+        
+        $("#colocacionPesos").jqxNumberInput({ width: '250px', height: '25px', theme:theme, digits:6, decimalDigits: 0});
+        $("#colocacionA2J9").jqxNumberInput({ width: '250px', height: '25px', theme:theme, digits:6, decimalDigits: 0});
         */
+       
+        
     
         if ($("#id").val() == 0){
             $("#titulo").text('Nuevo Cierre Letes');
@@ -73,12 +81,15 @@
                 $("#fechaHora").val(data.fechahora);
                 $("#plazos").val(data.plazos);
                 $("#minimos").val(data.minimos);
-                $("#colocacionPesos").val(data.colocacionPesos);
                 $("#colocacionDolares").val(data.colocacionDolares);
                 /*
                 $("#colocacionLebacsNov").val(data.colocacionLebacsNov);
                 $("#colocacionLebacsDic").val(data.colocacionLebacsDic);
+        
+                $("#colocacionPesos").val(data.colocacionPesos);
+                $("#colocacionA2J9").val(data.colocacionA2J9);
                 */
+                
             }
             , 'json');
         };
@@ -98,9 +109,7 @@
                     { input: '#minimos', message: 'No coinciden la cantidad de plazos y de minimos!',  rule: function(){
                         return ($("#plazos").val().split(",").length == $("#minimos").val().split(",").length);
                     }},
-                    { input: '#colocacionPesos', message: 'Debe ingresar el numero de colocación en pesos!',  rule: function(){
-                        return $("#colocacionPesos").val() > 30;
-                    } },
+                    
                     { input: '#colocacionDolares', message: 'Debe ingresar el numero de colocación en dolares!',  rule: function(){
                         return $("#colocacionDolares").val() > 30;
                     } },
@@ -111,7 +120,15 @@
                     { input: '#colocacionLebacsDic', message: 'Debe ingresar el numero de colocación en lebacs Dic!',  rule: function(){
                         return $("#colocacionLebacsDic").val() > 30;
                     } },
+                    
+                    { input: '#colocacionPesos', message: 'Debe ingresar el numero de colocación en pesos!',  rule: function(){
+                        return $("#colocacionPesos").val() > 30;
+                    } },
+                    { input: '#colocacionA2J9', message: 'Debe ingresar el numero de colocación de A2J9!',  rule: function(){
+                        return $("#colocacionA2J9").val() > 30;
+                    } },
                     */
+                    
                     { input: '#fechaHora', message: 'Ya existe un cierre con esa fecha y hora!',  rule: function(){
                             var fechaHora = moment($("#fechaHora").jqxDateTimeInput('val','date'));
                             datos = {
@@ -149,14 +166,16 @@
                     fechahora: fechaHora.format("YYYY-MM-DD HH:mm") + ":00",
                     plazos: $('#plazos').val(),
                     minimos: $("#minimos").val(),
-                    colocacionPesos: $("#colocacionPesos").val(),
+                    
                     colocacionDolares: $("#colocacionDolares").val()
                     /*
-                    ,
-                    
                     colocacionLebacsNov: $("#colocacionLebacsNov").val(),
                     colocacionLebacsDic: $("#colocacionLebacsDic").val()
+                
+                    colocacionPesos: $("#colocacionPesos").val(),
+                    colocacionA2J9: $("#colocacionA2J9").val()
                     */
+                   
                 }
                 $.post('/letes/saveCierre', datos, function(data){
                     if (data.id > 0){

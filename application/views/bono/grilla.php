@@ -18,6 +18,8 @@
         };
         var DACierre = new $.jqx.dataAdapter(srcCierre);
         
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
+
         $("#cierre").on('bindingComplete', function(event){
             $.post('/bono/getCierreActual', function(cierre){
                 if (!cierre.cerrado){
@@ -53,7 +55,7 @@
                 { name: 'cantidad', type: 'number'},
                 { name: 'precio', type: 'float'},
                 { name: 'comitente'},
-                { name: 'tipoPersona'},
+//                { name: 'tipoPersona'},
                 { name: 'oficial'},
                 { name: 'cuit', type: 'number'},
                 { name: 'estado'},
@@ -99,7 +101,7 @@
                         { text: 'Cantidad', datafield: 'cantidad', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum']},
                         { text: 'Tasa', datafield: 'precio', width: 100, cellsalign: 'right', cellsformat: 'd10'},
                         { text: 'Comitente', datafield: 'comitente', width: 200},
-                        { text: 'Tipo Per', datafield: 'tipoPersona', width: 100},
+//                        { text: 'Tipo Per', datafield: 'tipoPersona', width: 100},
                         { text: 'Oficial', datafield: 'oficial', width: 200},
                         { text: 'CUIT', datafield: 'cuit', width: 100},
                         { text: 'Estado', datafield: 'estado', width: 100},
@@ -252,6 +254,9 @@
     });
 </script>
 <div id="cierre"></div>
+<br>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Grilla Letes 140</ul></div>
+<br>
 <br>
 <div id="grilla"></div>
 <div id="botonera">

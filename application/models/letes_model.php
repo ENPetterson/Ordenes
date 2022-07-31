@@ -26,12 +26,13 @@ class Letes_model extends CI_Model{
     public $fechahora;
     public $plazos;
     public $minimos;
-    public $colocacionPesos;
+//    public $colocacionPesos;
     public $colocacionDolares;
     /*
     public $colocacionLebacsNov;
     public $colocacionLebacsDic;
     */
+//    public $colocacionA2J9;
     private $workbook;
     private $sheetIndex;
     
@@ -160,13 +161,14 @@ class Letes_model extends CI_Model{
         $cierre->fechahora = $this->fechahora;
         $cierre->plazos = $this->plazos;
         $cierre->minimos = $this->minimos;
-        $cierre->colocacionPesos = $this->colocacionPesos;
+//        $cierre->colocacionPesos = $this->colocacionPesos;
         $cierre->colocacionDolares = $this->colocacionDolares;
         /*
         $cierre->colocacionLebacsNov = $this->colocacionLebacsNov;
         $cierre->colocacionLebacsDic = $this->colocacionLebacsDic;
          * 
          */
+//        $cierre->colocacionA2J9 = $this->colocacionA2J9;
         R::store($cierre);
         return $cierre->export();
     }
@@ -273,17 +275,50 @@ class Letes_model extends CI_Model{
                 $vencimiento = '30/04/2020';
             }
              * 
+             */
+            
+            
+            
             switch ($fila['moneda']){
+                /*
                 case '$':
                     if ($fila['tramo'] == 'Competitiva') {
-                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - Int Pesos - Tramo Competitivo");
+                        switch ($fila['plazo']){
+                            case 111:
+                                $titulo = utf8_decode("Lelink Vto 04/09/2019  - Int Pesos - Tramo Competitivo");
+                                break;
+                            case 140:
+                                $titulo = utf8_decode("Lelink Vto 03/10/2019  - Int Pesos - Tramo Competitivo");
+                                break;
+                            case 173:
+                                $titulo = utf8_decode("Lelink Vto 05/11/2019  - Int Pesos - Tramo Competitivo");
+                                break;
+                            case 202:
+                                $titulo = utf8_decode("Lelink Vto 04/12/2019  - Int Pesos - Tramo Competitivo");
+                                break;
+                        }
                         $precio = $fila['precio'];
                     } else {
-                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - Int Pesos - Tramo NO Competitivo");
+                        switch ($fila['plazo']){
+                            case 111:
+                                $titulo = utf8_decode("Lelink Vto 04/09/2019  - Int Pesos - Tramo NO Competitivo");
+                                break;
+                            case 140:
+                                $titulo = utf8_decode("Lelink Vto 03/10/2019  - Int Pesos - Tramo NO Competitivo");
+                                break;
+                            case 173:
+                                $titulo = utf8_decode("Lelink Vto 05/11/2019  - Int Pesos - Tramo NO Competitivo");
+                                break;
+                            case 202:
+                                $titulo = utf8_decode("Lelink Vto 04/12/2019  - Int Pesos - Tramo NO Competitivo");
+                                break;
+                        }
                         $precio = '';
                     }
                     $colocacion = $cierre['colocacionPesos'];
                     break;
+                */
+                /*    
                 case 'LN':
                     if ($fila['tramo'] == 'Competitiva') {
                         $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - INT LEBAC NOVIEMBRE - Tramo Competitivo");
@@ -304,20 +339,55 @@ class Letes_model extends CI_Model{
                     }
                     $colocacion = $cierre['colocacionLebacsDic'];                    
                     break;
+                  
+                  
+                  
+                case 'A2J9':
+                    $titulo = utf8_decode("Lelink - Int Bono Dual 2019 -");
+                    $precio = '';
+                    $colocacion = $cierre['colocacionA2J9'];
+                    break;
+                 * 
+                 */
+                
                 case 'u$s':
                     if ($fila['tramo'] == 'Competitiva') {
-                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - Int Dolares - Tramo Competitivo");
+                        switch ($fila['plazo']){
+                            case 35:
+                                $titulo = utf8_decode("Letras 35 dias Vto. 04/10/2019 Tramo Competitivo - Integracion Dolares");
+                                break;
+                            case 140:
+                                $titulo = utf8_decode("Letras 140 dias Vto. 17/01/2020 Tramo Competitivo - Integracion Dolares");
+                                break;
+//                            case 173:
+//                                $titulo = utf8_decode("Lelink Vto 05/11/2019  - Int Dolar - Tramo Competitivo");
+//                                break;
+//                            case 202:
+//                                $titulo = utf8_decode("Lelink Vto 04/12/2019  - Int Dolar - Tramo Competitivo");
+//                                break;
+                        }
                         $precio = $fila['precio'];
                     } else {
-                        $titulo = utf8_decode("LECAP en Pesos Vto {$vencimiento}  - Int Dolares - Tramo NO Competitivo");
+                        switch ($fila['plazo']){
+                            case 35:
+                                $titulo = utf8_decode("Letras 35 dias Vto. 04/10/2019 Tramo NO Competitivo - Integracion Dolares");
+                                break;
+                            case 140:
+                                $titulo = utf8_decode("Letras 140 dias Vto. 17/01/2020 Tramo NO Competitivo - Integracion Dolares");
+                                break;
+//                            case 173:
+//                                $titulo = utf8_decode("Lelink Vto 05/11/2019  - Int Dolar - Tramo NO Competitivo");
+//                                break;
+//                            case 202:
+//                                $titulo = utf8_decode("Lelink Vto 04/12/2019  - Int Dolar - Tramo NO Competitivo");
+//                                break;
+                        }
                         $precio = '';
                     }
                     $colocacion = $cierre['colocacionDolares'];
                     
                     break;
             }
-             * 
-             */
             /*
             switch ($fila['moneda']){
                 case '$':
@@ -331,9 +401,6 @@ class Letes_model extends CI_Model{
                     $colocacion = $cierre['colocacionPesos'];
                     break;
                 case 'u$s':
-             * 
-             */
-            
             // 2019/02/18 Se comenta.
 //                    if ($fila['tramo'] == 'Competitiva') {
 //                        $titulo = utf8_decode("LETES a 217 dias  Vto 13/09/2019  Tramo Competitivo");
@@ -345,13 +412,16 @@ class Letes_model extends CI_Model{
 //                    $colocacion = $cierre['colocacionDolares'];
             // 2019/02/18
             if ($fila['tramo'] == 'Competitiva') {
-                        $titulo = utf8_decode("Letras 217 dias Vto. 29/11/2019 Tramo Competitivo");
+                        $titulo = utf8_decode("Letras 70 dias Vto. 19/07/2019 Tramo Competitivo");
                         $precio = $fila['precio'];
                     } else {
-                        $titulo = utf8_decode("Letras 217 dias Vto. 29/11/2019 Tramo NO Competitivo");
+                        $titulo = utf8_decode("Letras 70 dias Vto. 19/07/2019 Tramo NO Competitivo");
                         $precio = '';
                     }
+             * 
             $colocacion = $cierre['colocacionDolares'];    
+             * 
+             */
             
             if ($fila['tipopersona'] == 'FISICA'){
                 $tipoPersona = 'Persona Fisica';

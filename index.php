@@ -30,6 +30,8 @@
 
     // set the environment constant
     define('ENVIRONMENT', $environment);
+	
+	
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING
@@ -42,10 +44,12 @@
 if (defined('ENVIRONMENT')) {
 
     switch (ENVIRONMENT) {
+        case 'test':
         case 'testing':
         case 'javierdev':
         case 'desajavier':
         case 'ubuntu':
+		case 'production':
             //error_reporting(E_ALL);
             error_reporting(E_ERROR | E_PARSE);
             ini_set('display_errors', 1);
@@ -63,7 +67,7 @@ if (defined('ENVIRONMENT')) {
             break;
 
         default:
-            exit('The application environment is not set correctly.');
+            exit('The application environment is lalala set correctly.');
     }
 }
 

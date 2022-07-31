@@ -114,6 +114,15 @@ class LetesPesos extends MY_AuthController {
         echo json_encode($resultado);
     }
     
+    public function getPlazosEspecie(){
+        $this->load->model('LetesPesos_model');
+        $this->LetesPesos_model->cierreletespesos_id = $this->input->post('cierreletespesos_id');
+        $this->LetesPesos_model->moneda = $this->input->post('moneda');
+        $resultado = $this->LetesPesos_model->getPlazosEspecie();
+        echo json_encode($resultado);
+    }
+    
+    
     public function getMonedas(){
         $this->load->model('LetesPesos_model');
         $this->LetesPesos_model->cierreletespesos_id = $this->input->post('cierreletespesos_id');

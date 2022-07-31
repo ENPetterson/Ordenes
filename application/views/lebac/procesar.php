@@ -18,6 +18,8 @@
             async: false
         };
         var DACierre = new $.jqx.dataAdapter(srcCierre);
+
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
         
         $("#cierre").on('bindingComplete', function(event){
             $.post('/lebac/getCierreActual', function(cierre){
@@ -58,6 +60,7 @@
                 { name: 'oficial'},
                 { name: 'usuario'},
                 { name: 'cuit', type: 'number'},
+                { name: 'fhmodificacion', type: 'date', format: 'yyyy-MM-dd HH:mm:ss'},
                 { name: 'estado'},
                 { name: 'estado_id'},
                 { name: 'envio'},
@@ -85,8 +88,8 @@
                 showstatusbar: true,
                 statusbarheight: 25,
                 showaggregates: true,
-                width: 1680,
-                height: 400,
+                width: "98%",
+                height: 420,
                 columns: [
                         { text: 'Id', datafield: 'id', width: 80, cellsalign: 'right', cellsformat: 'd', aggregates: ['count'] },
                         { text: 'Tramo', datafield: 'tramo', width: 110 },
@@ -94,8 +97,8 @@
                         { text: 'Mone', datafield: 'moneda', width: 30},
                         { text: 'Plazo', datafield: 'plazo', width: 40, cellsalign: 'right'},
                         { text: 'Comis', datafield: 'comision', width: 60, cellsalign: 'right', cellsformat: 'd4'},
-                        { text: 'Cantidad', datafield: 'cantidad', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum'] },
-                        { text: 'Tenencia', datafield: 'tenencia', width: 140, cellsalign: 'right', cellsformat: 'd' },
+                        { text: 'Cantidad', datafield: 'cantidad', width: 110, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum'] },
+                        { text: 'Tenencia', datafield: 'tenencia', width: 50, cellsalign: 'right', cellsformat: 'd' },
                         { text: 'Posicion', datafield: 'posicion', width: 140, cellsalign: 'right', cellsformat: 'd' , hidden: true},
                         { text: 'Precio', datafield: 'precio', width: 100, cellsalign: 'right', cellsformat: 'd10'},
                         { text: 'Comitente', datafield: 'comitente', width: 200},
@@ -103,6 +106,7 @@
                         { text: 'Oficial', datafield: 'oficial', width: 200},
                         { text: 'Usuario', datafield: 'usuario', width: 150},
                         { text: 'CUIT', datafield: 'cuit', width: 100},
+                        { text: 'Generada', datafield: 'fhmodificacion', width: 150, cellsformat: 'dd/MM/yyyy HH:mm:ss'},
                         { text: 'Estado', datafield: 'estado', width: 90},
                         { text: 'estado_id', datafield: 'estado_id', width: 0, hidden: true},
                         { text: 'Inst', datafield: 'envio', width: 30},
@@ -124,6 +128,7 @@
         
         $("#enviarSantanderButton").jqxButton({ width: '160', theme: theme, disabled: true });
         $("#enviarMercadoButton").jqxButton({ width: '160', theme: theme, disabled: true });
+        $("#generarTxtButton").jqxButton({ width: '160', theme: theme, disabled: true });
         $("#editarButton").jqxButton({ width: '160', theme: theme, disabled: true });
         $("#anularButton").jqxButton({ width: '160', theme: theme, disabled: true });
         
@@ -174,6 +179,48 @@
                 });                
             }, 'json');
         });
+
+        $("#generarTxtButton").click(function(){
+            $("#grilla").ajaxloader();
+            var datos = {ordenes: enviar};
+            $("#grilla").ajaxloader();
+            $.post('/lebac/previewTxt', datos, function(data){
+                
+                $.each(data.uris, function(indice, uri){
+                    $.fileDownload(uri, {  
+                   successCallback: function (url) {  
+                       alert('You just got a file download dialog or ribbon for this URL :' + url); 
+                       },  
+                       failCallback: function (html, url) {    
+                        alert('Your file download just failed for this URL:' + url + '\r\n' +     
+                                              'Here was the resulting error HTML: \r\n' + html);    
+                        }
+                    }                      );
+                });
+                new Messi('Generar txt ?' , {title: 'Confirmar',titleClass: 'warning', modal: true,
+                    buttons: [{id: 0, label: 'Si', val: 's'}, {id: 1, label: 'No', val: 'n'}], callback: function(val) { 
+                        if (val == 's'){
+                            $.post('/lebac/generarTxt', datos, function(data){
+                                var titleClass;
+                                if (data.exito == 0){
+                                    titleClass = 'error';
+                                } else {
+                                    titleClass = 'success';
+                                }
+                                $("#grilla").ajaxloader('hide');
+                                new Messi(data.resultado, {title: 'Mensaje', modal: true,
+                                    buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass});
+                                $('#grilla').jqxGrid('updatebounddata');
+                                $('#grilla').jqxGrid('clearselection');
+                            }, 'json');                            
+                        } else {
+                            $("#grilla").ajaxloader('hide');
+                        }
+                    }
+                });                
+            }, 'json');
+        });
+
         
         $("#anularButton").click(function(){
             new Messi('Desea anular las ordenes ' + enviar.join(', ') + ' ?' , {title: 'Confirmar',titleClass: 'warning', modal: true,
@@ -208,6 +255,7 @@
             var rowindexes = $('#grilla').jqxGrid('getselectedrowindexes');
             $('#enviarSantanderButton').jqxButton({disabled: true });
             $('#enviarMercadoButton').jqxButton({disabled: true });
+            $('#generarTxtButton').jqxButton({disabled: true });
             $('#editarButton').jqxButton({disabled: true });
             $('#anularButton').jqxButton({disabled: true });
             if (rowindexes.length > 0){
@@ -227,6 +275,7 @@
                     }
                     $('#enviarSantanderButton').jqxButton({disabled: false });
                     $('#enviarMercadoButton').jqxButton({disabled: false });
+                    $('#generarTxtButton').jqxButton({disabled: false });
                     $('#anularButton').jqxButton({disabled: false });
                     $("#ventanaResumen").jqxWindow('open');
                 }
@@ -330,6 +379,7 @@
                 $('#grilla').jqxGrid('updatebounddata');
                 $('#enviarSantanderButton').jqxButton({disabled: true });
                 $('#enviarMercadoButton').jqxButton({disabled: true });
+                $('#generarTxtButton').jqxButton({disabled: true });
                 $('#grilla').jqxGrid('clearselection');
                 $('#ventanaPreviewSantander').jqxWindow('close');
             }, 'json');
@@ -339,12 +389,16 @@
 </script>
 <div id="cierre"></div>
 <br>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Procesar Lecer</ul></div>
+<br>
+<br>
 <div id="grilla"></div>
 <div id="botonera">
     <table boder="0" cellpadding="2" cellspacing="2">
         <tr>
             <td><input type="button" value="Enviar a Santander" id="enviarSantanderButton"></td>
             <td><input type="button" value="Enviar a Mercado" id="enviarMercadoButton"></td>
+            <td><input type="button" value="Generar Txt" id="generarTxtButton"></td>
             <td><input type="button" value="Anular" id="anularButton"></td>
             <td><input type="button" value="Editar" id="editarButton"></td>
             <td><input type="button" value="Generar Excel" id="excelButton"></td>

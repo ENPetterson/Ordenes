@@ -116,13 +116,16 @@ class Letes extends MY_AuthController {
         $this->Letes_model->fechahora = $fechaHora;
         $this->Letes_model->plazos = $plazos;
         $this->Letes_model->minimos = $minimos;
-        $this->Letes_model->colocacionPesos = $this->input->post('colocacionPesos');
         $this->Letes_model->colocacionDolares = $this->input->post('colocacionDolares');
         /*
         $this->Letes_model->colocacionLebacsNov = $this->input->post('colocacionLebacsNov');
         $this->Letes_model->colocacionLebacsDic = $this->input->post('colocacionLebacsDic');
+
+        $this->Letes_model->colocacionPesos = $this->input->post('colocacionPesos');
+        $this->Letes_model->colocacionA2J9 = $this->input->post('colocacionA2J9');
          * 
          */
+        
         $cierre = $this->Letes_model->saveCierre();
         echo json_encode($cierre);
     }

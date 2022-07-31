@@ -18,7 +18,7 @@ class Bono_model extends CI_Model{
     public $cantidad;
     public $precio;
     public $comitente;
-    public $tipoPersona;
+//    public $tipoPersona;
     public $oficial;
     public $cuit;
     public $ordenes;
@@ -60,7 +60,7 @@ class Bono_model extends CI_Model{
         $orden->cantidad = $this->cantidad;
         $orden->precio = $this->precio;
         $orden->comitente = $this->comitente;
-        $orden->tipopersona = $this->tipoPersona;
+//        $orden->tipopersona = $this->tipoPersona;
         $orden->oficial = $this->oficial;
         $orden->cuit = (double) $this->cuit;
         $orden->fhmodificacion =  R::isoDateTime();
@@ -93,7 +93,7 @@ class Bono_model extends CI_Model{
                 b.cantidad,
                 b.precio,
                 b.comitente,
-                b.tipoPersona,
+                
                 b.oficial,
                 b.cuit,
                 eo.estado,
@@ -157,7 +157,6 @@ class Bono_model extends CI_Model{
     
     
     public function getCierre(){
-        
         $cierreBean = R::load('cierrebono', $this->cierrebono_id);
         $cierre = $cierreBean->export();
         $sql = "select * from plazobono where cierrebono_id = ? order by moneda, plazo";
@@ -201,6 +200,7 @@ class Bono_model extends CI_Model{
     
     public function getCierreActual(){
         $cierreActual = R::findOne('cierrebono', 'fechahora > NOW() order by fechahora' );
+                
         if (is_null($cierreActual)){
             return array('cerrado'=>true);
         } else {
@@ -263,7 +263,7 @@ class Bono_model extends CI_Model{
                 b.cantidad,
                 b.precio,
                 b.comitente,
-                b.tipoPersona,
+                
                 b.oficial,
                 concat(u.apellido, ' ', u.nombre) as usuario,
                 b.cuit,
@@ -325,7 +325,7 @@ class Bono_model extends CI_Model{
                         tramo,
                         moneda, 
                         cable,
-                        tipopersona,
+                        
                         plazo, 
                         numcomitente,
                         comitente,
@@ -358,15 +358,15 @@ class Bono_model extends CI_Model{
 //                $colocacion = $plazo->colocacionNC;
 //            }
             
-//            switch ($fila['plazo']){
-//		case '183':
+            switch ($fila['plazo']){
+		case '100':
 		    switch ($fila['moneda']){
 		        case '$':
 		            if ($fila['tramo'] == 'Competitiva'){
-		                $titulo = utf8_decode('Boncer en $ Vto. 2021 Tramo Competitivo - Int Pesos');
+		                $titulo = utf8_decode('Letras 140 dias Vto. 17/01/2020 Tramo Competitivo  - Integracion Pesos');
 		                $precio = $fila['precio'];
 		            } else {
-		                $titulo = utf8_decode('Boncer en $ Vto. 2021 Tramo NO Competitivo - Int Pesos');
+		                $titulo = utf8_decode('Letras 140 dias Vto. 17/01/2020 Tramo NO Competitivo  - Integracion Pesos');
 		                $precio = '';
 		            }
 		            break;
@@ -381,18 +381,8 @@ class Bono_model extends CI_Model{
 		            }
 		            break;
 	    	    }
-//                break;
-//            }
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+                break;
+            }            
             
             if ($indice == 0){
                 $colocacionAnterior = $colocacion;
@@ -403,11 +393,11 @@ class Bono_model extends CI_Model{
                 $colocacionAnterior = $colocacion;
             }
             
-            if ($fila['tipopersona'] == 'JURIDICA'){
-                $tipoPersona = 'Persona Juridica';
-            } else {
-                $tipoPersona = 'Persona Fisica';
-            }
+//            if ($fila['tipopersona'] == 'JURIDICA'){
+//                $tipoPersona = 'Persona Juridica';
+//            } else {
+//                $tipoPersona = 'Persona Fisica';
+//            }
             
             if ($fila['moneda'] == '$'){
                 $moneda = 'Pesos';
@@ -446,7 +436,7 @@ class Bono_model extends CI_Model{
             
             $contenido[$contenidoInd]['colocacion'] = $colocacion;
             //$contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $this->formatearCuit($fila['cuit']) . "\t" . $fila['numcomitente'] . "\r\n";
-            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t" . $moneda . "\t" . $fila['cuit']  . "\t" . $fila['comitente'] . "\t\t". $tipoInversor . "\t" . $tipoPersona . "\t\r\n";
+            $contenido[$contenidoInd]['datos'] .= $colocacion . "\t" . $titulo . "\t" . $precio . "\t" . $fila['cantidad'] . "\t\t" . $fila['numcomitente'] . "\t" . $moneda . "\t" . $fila['cuit']  . "\t" . $fila['comitente'] . "\t\t". $tipoInversor . "\t\r\n";
             
         }
         $this->load->library('zip');
@@ -463,7 +453,7 @@ class Bono_model extends CI_Model{
         return array('uris'=>array(base_url() . 'generadas/' . basename($nombreZip)));
     }
     
-    public function enviarMercado(){        
+    public function enviarMercado(){
         $estado = R::load('estadoorden', 3);
         $resultado = array('exito'=>1, 'resultado'=>'Ordenes Enviadas Correctamente');
         foreach ($this->ordenes as $id) {
@@ -513,7 +503,6 @@ class Bono_model extends CI_Model{
                                     cantidad,
                                     precio,
                                     comitente,
-                                    tipopersona,
                                     oficial,
                                     cuit
                             from    bono
@@ -560,7 +549,6 @@ class Bono_model extends CI_Model{
                                         <td align='right'>{$orden['cantidad']}</td>
                                         <td align='right'>{$orden['precio']}</td>
                                         <td>{$orden['comitente']}</td>
-                                        <td>{$orden['tipopersona']}</td>
                                         <td>{$orden['oficial']}</td>
                                         <td>{$orden['cuit']}</td>
                                     </tr>

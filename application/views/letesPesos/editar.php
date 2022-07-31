@@ -35,10 +35,16 @@
                     <td style="padding-right:10px; padding-bottom: 10px">Cantidad V/N: </td>
                     <td><div id="cantidad"></div></td>
                 </tr>
+<!--                <tr id="filaPrecio">
+                    <td style="padding-right:10px; padding-bottom: 10px">Precio por cada 5 PBS: </td>
+                    <td><div id="precio" ></div></td>
+                </tr>-->
+                
                 <tr id="filaPrecio">
-                    <td style="padding-right:10px; padding-bottom: 10px">Precio por cada 1000 de VN: </td>
+                    <td style="padding-right:10px; padding-bottom: 10px">Precio c/1000: </td>
                     <td><div id="precio" ></div></td>
                 </tr>
+                
                 <tr>
                     <td style="padding-right: 10px; padding-bottom: 10px">Comitente:</td>
                     <td><input type="text" id="comitente" style="width: 250px"></td>
@@ -84,6 +90,8 @@
         
         $("#ventanaLetesPesos").jqxWindow({showCollapseButton: false, height: 500, width: 470, theme: theme, resizable: false, keyboardCloseKey: -1});
         $("#tramo").jqxDropDownList({ width: '300px', height: '25px', source: ['No Competitiva', 'Competitiva'], theme: theme, selectedIndex: 0, disabled: false});
+//        $("#tramo").jqxDropDownList({ width: '300px', height: '25px', source: ['No Competitiva'], theme: theme, selectedIndex: 0, disabled: false});
+
         $("#numComitente").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999});
         var srcMonedas = {
             datatype: 'json',
@@ -99,7 +107,7 @@
         var DAMonedas = new $.jqx.dataAdapter(srcMonedas);
         $("#moneda").jqxDropDownList({ width: '300px', height: '25px', source: DAMonedas, theme: theme, placeHolder: 'elija la moneda', displayMember: 'nombre', valueMember: 'simbolo'});
         $("#cable").jqxCheckBox({height: '20px', theme: theme});
-        $("#plazo").jqxDropDownList({ width: '110px', height: '25px', theme: theme, placeHolder: 'elija plazo'});
+        $("#plazo").jqxDropDownList({ width: '200px', height: '25px', theme: theme, placeHolder: 'elija plazo'});
         $("#comision").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 1, groupSeparator: ' ', max: 99, theme: theme});
         $("#cantidad").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 9999999999, theme: theme});
         $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 4, groupSeparator: ' ', max: 9999.99, theme: theme});
@@ -153,7 +161,7 @@
         
         $('#cantidad').on('valueChanged', function (event) {
             var value = $("#cantidad").val();
-            if (value < 2000000){
+            if (value <= 3000000){
                 $("#tramo").jqxDropDownList({selectedIndex: 0 });
                 $("#tramo").jqxDropDownList({ disabled: false }); 
             } else {
@@ -178,13 +186,17 @@
         
         $("#moneda").on('change', function(event){
             var args = event.args;
+            
+            
             if (args){
                 var datos = {cierreletespesos_id: cierreletespesos_id, moneda: getDropDown("#moneda")};
-                var url = '/letesPesos/getPlazos';
+                var url = '/letesPesos/getPlazosEspecie';
                 $.post(url, datos, function(plazos){
                     $("#plazo").jqxDropDownList('clear'); 
                     $.each(plazos, function(index,value){
-                        $("#plazo").jqxDropDownList('addItem', value ); 
+                        
+                        
+                        $("#plazo").jqxDropDownList('addItem', value.plazo + ' ' + value.especie ); 
                     });
                     setDropDown("#plazo", plazoCargado);
                 }, 'json');
@@ -196,6 +208,7 @@
             if (args){
                 plazoCargado = args.item.value;
             }
+            $('#form').jqxValidator('hideHint', '#precio');
         });
         
     
@@ -246,40 +259,40 @@
                 { input: '#moneda', message: 'Debe Seleccionar la moneda!', action: 'keyup, blur',  rule: function(){
                     return ($("#moneda").jqxDropDownList('getSelectedIndex') != -1);
                 }},
-                { input: '#plazo', message: 'Debe elegir el plazo!', action: 'change',  rule: function(){
-                    return ($("#plazo").val() >= 28);
-                }},
-                { input: '#cantidad', message: 'Cantidad incorrecta!', action: 'keyup, blur',  rule: function(){
-                    var result = true;
-                    var minimo;
-                    var multiplo;
-                    var maximo = 0;
-                    var minimo = 10000;
-                    var multiplo = 1;
-                    var cantidad = $("#cantidad").val();
-                    
-                    if ($("#tramo").jqxDropDownList('getSelectedIndex') == 0){
-                        maximo = 2000001;
-                    } else {
-                        maximo = 0;
-                    }
-                    
-                    $('#form').jqxValidator('hideHint', '#cantidad');
-                    if (maximo > 0 && cantidad > maximo){
-                        $('#form').jqxValidator('rules')[3].message = "La cantidad no puede ser mayor que " + maximo.toString() + "!";
-                        result = false;
-                    }
-                    if (cantidad < minimo){
-                        $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser mayor o igual que " + minimo.toString() + "!";
-                        result = false;
-                    } else {
-                        if (cantidad % multiplo > 0){
-                            $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser multiplo de " + multiplo.toString() +"!";
-                            result = false;
-                        }
-                    }
-                    return result;
-                }},
+//                { input: '#plazo', message: 'Debe elegir el plazo!', action: 'change',  rule: function(){
+//                    return ($("#plazo").val() >= 28);
+//                }},
+//                { input: '#cantidad', message: 'Cantidad incorrecta!', action: 'keyup, blur',  rule: function(){
+//                    var result = true;
+//                    var minimo;
+//                    var multiplo;
+//                    var maximo = 0;
+//                    var minimo = 10000;
+//                    var multiplo = 1;
+//                    var cantidad = $("#cantidad").val();
+//                    
+//                    if ($("#tramo").jqxDropDownList('getSelectedIndex') == 0){
+//                        maximo = 3000001;
+//                    } else {
+//                        maximo = 0;
+//                    }
+//                    
+//                    $('#form').jqxValidator('hideHint', '#cantidad');
+//                    if (maximo > 0 && cantidad > maximo){
+//                        $('#form').jqxValidator('rules')[3].message = "La cantidad no puede ser mayor que " + maximo.toString() + "!";
+//                        result = false;
+//                    }
+//                    if (cantidad < minimo){
+//                        $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser mayor o igual que " + minimo.toString() + "!";
+//                        result = false;
+//                    } else {
+//                        if (cantidad % multiplo > 0){
+//                            $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser multiplo de " + multiplo.toString() +"!";
+//                            result = false;
+//                        }
+//                    }
+//                    return result;
+//                }},
                 
                 { input: '#comision', message: 'Valor incorrecto!', action: 'keyup, blur',  rule: function(){
                     if ($("#comision").val() > 3) {
@@ -288,20 +301,85 @@
                         return true;
                     }
                 }},
-                { input: '#precio', message: 'El precio debe ser mayor que cero!', action: 'keyup, blur',  rule: function(){
-                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#precio").val() == 0) {
+//                { input: '#precio', message: 'El precio debe ser mayor que cero!', action: 'keyup, blur',  rule: function(){
+//                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#precio").val() == 0) {
+//                        return false;
+//                    } else {
+//                        return true;
+//                    }
+//                }},
+//                { input: '#precio', message: 'El precio debe ser menor que 9999 !', action: 'keyup, blur',  rule: function(){
+//                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1  && $("#precio").val() >= 9999) {
+//                        return false;
+//                    } else {
+//                        return true;
+//                    }
+//                }},
+//                
+
+//                { input: '#precio', message: 'El precio no puede ser menor a $980.67 en 5359', action: 'keyup, blur',  rule: function(){
+//                    
+//                    
+//                    console.log($('#plazo').jqxDropDownList('getSelectedIndex'));
+//                               
+//                    if (  $('#plazo').jqxDropDownList('getSelectedIndex') == 0  && $("#precio").val() < 980.67 && $('#tramo').jqxDropDownList('getSelectedIndex') == 1
+//                    ) { // Pesos CER
+//                        return false;
+//                    } else{
+//                        return true;
+//                    }
+//                }},
+
+
+//                { input: '#precio', message: 'El precio no puede ser menor a $991.03 en 5360', action: 'keyup, blur',  rule: function(){
+//                    if ( 
+//                          $('#plazo').jqxDropDownList('getSelectedIndex') == 1  && $("#precio").val() < 991.03 && $('#tramo').jqxDropDownList('getSelectedIndex') == 1
+//                    ) { // Pesos CER
+//                        return false;
+//                    } else{
+//                        return true;
+//                    }
+//                }},
+//
+//                { input: '#precio', message: 'El precio no puede ser menor a $1000.88 en 5361!', action: 'keyup, blur',  rule: function(){
+//                    if (
+//                          $('#plazo').jqxDropDownList('getSelectedIndex') == 2  && $("#precio").val() < 1000.88 && $('#tramo').jqxDropDownList('getSelectedIndex') == 1
+//                    ) { // Pesos CER
+//                        return false;
+//                    } else{
+//                        return true;
+//                    }
+//                }},
+
+
+                { input: '#precio', message: 'Precio minimo 934.14 para plazo 84!', action: 'keyup, blur',  rule: function(){
+                    
+            
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#plazo").val() == '84 LETE' && $("#precio").val() < 934.14 ) {
+//                    if ($("#plazo").val() == '50' && $("#precio").val() < 949.82 ) {
                         return false;
                     } else {
                         return true;
                     }
-                }},
-                { input: '#precio', message: 'El precio debe ser menor que 9999 !', action: 'keyup, blur',  rule: function(){
-                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1  && $("#precio").val() >= 9999) {
+                }},   
+            
+                { input: '#precio', message: 'Precio minimo 990.55 para plazo de 240!', action: 'keyup, blur',  rule: function(){
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#plazo").val() == '240 LECER' && $("#precio").val() < 990.55 ) {
                         return false;
                     } else {
                         return true;
                     }
-                }},
+                }},  
+
+
+
+
+
+
+
+
+
+//                
 //                { input: '#precio', message: 'El precio debe ser múltiplo de 1000 !', action: 'keyup, blur',  rule: function(){
 //                    if ($("#precio").val() % 1000 != 0){
 //                            $('#form').jqxValidator('rules')[3].message = "El precio debe ser multiplo de 1000!";

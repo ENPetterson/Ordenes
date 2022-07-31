@@ -1,6 +1,14 @@
+<?php
+$timestamp = time();
+?>
+
 <script type="text/javascript">
     $(document).ready(function () {
             // prepare the data
+            
+        var timestamp = <?= $timestamp; ?>;
+        var token = '<?= md5('unique_salt' . $timestamp); ?>'; 
+        
         var theme = getTheme();
         var id = 0;
         var enviar = [];
@@ -17,6 +25,8 @@
             async: false
         };
         var DACierre = new $.jqx.dataAdapter(srcCierre);
+
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
         
         $("#cierre").on('bindingComplete', function(event){
             $.post('/cupon/getCierreActual', function(cierre){
@@ -42,19 +52,27 @@
                 datafields: [
                 { name: 'id'},
                 { name: 'numComitente', type: 'number'},
-                { name: 'comision', type: 'float'},
+//                { name: 'comision', type: 'float'},
                 { name: 'cantidad', type: 'number'},
-                { name: 'cantidadACrecer', type: 'number'},
-                { name: 'precio', type: 'float'},
-                { name: 'segundaParte', type: 'bool'},
-                { name: 'cantidadAcrecerSegunda', type: 'number'},
+                { name: 'arancel', type: 'arancel'},
+                { name: 'especie'},
+                { name: 'plazo'},
+                { name: 'tipo'},
+//                { name: 'bono'},
+//                { name: 'cantidadACrecer', type: 'number'},
+//                { name: 'precio', type: 'float'},
+//                { name: 'segundaParte', type: 'bool'},
+//                { name: 'cantidadAcrecerSegunda', type: 'number'},
                 { name: 'comitente'},
                 { name: 'tipoPersona'},
                 { name: 'oficial'},
+                { name: 'usuario'},
                 { name: 'cuit', type: 'number'},
+                { name: 'posicion'},
                 { name: 'estado'},
                 { name: 'estado_id'},
-                { name: 'fhmodificacion', type: 'date', format: 'yyyy-MM-dd'}
+                { name: 'fhmodificacion', type: 'date', format: 'yyyy-MM-dd'},
+                { name: 'estaConfirmado'}
             ],
             cache: false,
             url: '/cupon/grilla',
@@ -85,19 +103,27 @@
                 columns: [
                         { text: 'Id', datafield: 'id', width: 80, cellsalign: 'right', cellsformat: 'd', aggregates: ['count']  },
                         { text: 'Nro Comitente', datafield: 'numComitente', width: 70},
-                        { text: 'Comis', datafield: 'comision', width: 60, cellsalign: 'right', cellsformat: 'd4'},
-                        { text: 'Cantidad', datafield: 'cantidad', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum']},
-                        { text: 'Cant a Crecer', datafield: 'cantidadACrecer', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum']},
-                        { text: 'Precio', datafield: 'precio', width: 100, cellsalign: 'right', cellsformat: 'd10'},
-                        { text: 'Segunda', datafield: 'segundaParte', width: 30, columntype: 'checkbox'},
-                        { text: 'Cant a Crec 2da', datafield: 'cantidadAcrecerSegunda', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum']},
+//                        { text: 'Comis', datafield: 'comision', width: 60, cellsalign: 'right', cellsformat: 'd4'},
+                        { text: 'Cantidad', datafield: 'cantidad', width: 90, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum']},
+                        { text: 'Arancel', datafield: 'arancel', width: 70, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum']},
+                        { text: 'Especie', datafield: 'especie', width: 90},
+                        { text: 'Código', datafield: 'plazo', width: 60},
+                        { text: 'CVSA', datafield: 'tipo', width: 60},
+//                        { text: 'Bono', datafield: 'bono', width: 60},
+//                        { text: 'Cant a Crecer', datafield: 'cantidadACrecer', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum']},
+//                        { text: 'Precio', datafield: 'precio', width: 100, cellsalign: 'right', cellsformat: 'd10'},
+//                        { text: 'Segunda', datafield: 'segundaParte', width: 30, columntype: 'checkbox'},
+//                        { text: 'Cant a Crec 2da', datafield: 'cantidadAcrecerSegunda', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum']},
                         { text: 'Comitente', datafield: 'comitente', width: 200},
                         { text: 'Tipo Per', datafield: 'tipoPersona', width: 100},
                         { text: 'Oficial', datafield: 'oficial', width: 200},
+                        { text: 'Usuario', datafield: 'usuario', hidden: true, width: 200},
                         { text: 'CUIT', datafield: 'cuit', width: 100},
+                        { text: 'Posicion', datafield: 'posicion', width: 60},
                         { text: 'Estado', datafield: 'estado', width: 100},
                         { text: 'estado_id', datafield: 'estado_id', width: 0, hidden: true},
-                        { text: 'Carga', datafield: 'fhmodificacion', width: 100, cellsformat: 'dd/MM/yyyy'}
+                        { text: 'Carga', datafield: 'fhmodificacion', width: 100, cellsformat: 'dd/MM/yyyy'},
+                        { text: 'WEB', datafield: 'estaConfirmado', width: 50, columntype: 'checkbox'}
                 ]
         });
         $("#grilla").on("bindingcomplete", function (event){
@@ -141,31 +167,53 @@
         });
         
         $("#enviarButton").click(function(){
-            new Messi('Desea enviar las ordenes seleccionadas ?' , {title: 'Confirmar',titleClass: 'warning', modal: true,
-                buttons: [{id: 0, label: 'Si', val: 's'}, {id: 1, label: 'No', val: 'n'}], callback: function(val) { 
-                    if (val == 's'){
-                        datos = {
-                            ordenes: enviar
-                        };
-                        $.post('/cupon/enviarOrdenes', datos, function(data){
-                            var titleClass;
-                            if (data.exito == 0){
-                                titleClass = 'error';
-                            } else {
-                                titleClass = 'success';
-                            }
-                            new Messi(data.resultado, {title: 'Mensaje', modal: true,
-                                buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass});
-                            $('#grilla').jqxGrid('updatebounddata');
-                            $('#editarButton').jqxButton({disabled: true });
-                            $('#borrarButton').jqxButton({disabled: true });
-                            $('#enviarButton').jqxButton({disabled: true });
-                            $('#grilla').jqxGrid('clearselection');
+            
+//            var titleClass;
+//            titleClass = 'success';
+//            new Messi('Estamos realizando procesos en el sistema. Aguarde unos minutos e intente nuevamente', {title: 'Mensaje', modal: true,
+//            buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass});
+            
+            
+            datos = {
+                cierre: $("#cierre").val()
+            };  
+            
+            $.post('/cupon/comprobarEstadoCierre', datos, function(data){
+                if(data == 'true'){
+                    var titleClass;
+                    titleClass = 'success';
+                    new Messi('Estamos realizando procesos en el sistema. Aguarde unos minutos e intente nuevamente', {title: 'Mensaje', modal: true,
+                    buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass});
+                }else{
+                    new Messi('Desea enviar las ordenes seleccionadas ?' , {title: 'Confirmar',titleClass: 'warning', modal: true,
+                        buttons: [{id: 0, label: 'Si', val: 's'}, {id: 1, label: 'No', val: 'n'}], callback: function(val) { 
+                            if (val == 's'){
+                                datos = {
+                                    ordenes: enviar
+                                };
+                                $.post('/cupon/enviarOrdenes', datos, function(data){
+                                    var titleClass;
+                                    if (data.exito == 0){
+                                        titleClass = 'error';
+                                    } else {
+                                        titleClass = 'success';
+                                    }
+                                    new Messi(data.resultado, {title: 'Mensaje', modal: true,
+                                        buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass});
+                                    $('#grilla').jqxGrid('updatebounddata');
+                                    $('#editarButton').jqxButton({disabled: true });
+                                    $('#borrarButton').jqxButton({disabled: true });
+                                    $('#enviarButton').jqxButton({disabled: true });
+                                    $('#grilla').jqxGrid('clearselection');
+                                }
+                                , 'json');
+                            } 
                         }
-                        , 'json');
-                    } 
+                    });
                 }
-            });
+            }
+            , 'json');
+            
         });
         
         
@@ -197,10 +245,57 @@
         });
         
         
+////////////////////////////////////////////////////////////////////////////////   
+        $("#archivoExcel").jqxButton({ width: '300', theme: theme, disabled: false });
+
+        $('#archivoExcel').uploadifive({
+            'uploadScript': '/uploadifive.php',
+            'formData': {
+                'timestamp': timestamp,
+                'token': token
+            },
+            'buttonText': 'Importar Excel...',
+            'multi': false,
+            'queueSizeLimit': 1,
+            'uploadLimit': 0,
+            'height': 20,
+            'width': 200,
+            'removeCompleted': true,
+            'onUploadComplete': function(file) {
+                $('#grilla').ajaxloader();
+                $.post('/cupon/grabarExcel', { file: file.name, cierre: $("#cierre").jqxDropDownList('getSelectedItem').value}, function(msg){
+                    var titleClass;
+                    var mensaje;
+                    var title;
+                    if(msg.resultado == 'OK'){
+                        titleClass = 'success';
+                        title = 'Correcto';
+                        mensaje = 'Se han importado las ordenes';
+                    } else {
+                        titleClass = 'error';
+                        title = 'No se importaron las ordenes';
+                        mensaje = msg.mensaje;
+                    }
+                    $('#grilla').ajaxloader('hide');
+                    new Messi(mensaje, {title: title, modal: true,
+                        buttons: [{id: 0, label: 'Cerrar', val: 'X'}], titleClass: titleClass, callback: function(val) { 
+                            if (val == 'X'){
+                                $("#grilla").jqxGrid('updatebounddata');
+                            } 
+                        }
+                    });                    
+                }, 'json');
+            }
+        });
+////////////////////////////////////////////////////////////////////////////////                   
+
         
     });
 </script>
 <div id="cierre"></div>
+<br>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Grilla Cupones</ul></div>
+<br>
 <br>
 <div id="grilla"></div>
 <div id="botonera">
@@ -210,6 +305,7 @@
             <td><input type="button" value="Editar" id="editarButton"></td>
             <td><input type="button" value="Borrar" id="borrarButton"></td>
             <td><input type="button" value="Enviar a Backoffice" id="enviarButton"></td>
+            <td id='archivoExcelFila'><input type="file" value="Archivo" id="archivoExcel"></td>
         </tr>
     </table>
 </div>

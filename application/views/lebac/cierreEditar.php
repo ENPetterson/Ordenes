@@ -34,6 +34,12 @@
                     <td style="padding: 10px 10px 3px 0px">Instrumento: </td>
                     <td><input type="text" id="instrumentoLebac"></td>
                 </tr>
+                
+                <tr>
+                    <td style="padding-right: 10px; padding-bottom: 10px">pausarCierre:</td>
+                    <td><div id="pausarCierre"></div></td>
+                </tr>
+                
                 <tr>
                     <td colspan="2" style="text-align: center; padding-top: 20px">
                         <input type="button" id="aceptarButton" value="Aceptar">
@@ -63,6 +69,10 @@
                 <tr>
                     <td>Colocacion:</td>
                     <td><div id="colocacion"></div></td>
+                </tr>
+                <tr>
+                    <td>Precio Minimo Competitivo:</td>
+                    <td><div id="precioMinimoC"></div></td>
                 </tr>
                 <tr>
                     <td>Titulo Competitivo:</td>
@@ -108,6 +118,8 @@
         
         $("#instrumentoLebac").jqxInput({height: '20px', width: '190px', theme: theme});
         
+        $("#pausarCierre").jqxCheckBox({ width: 200, height: 20, theme: theme });
+        
         $('#fechaHora').on('change', function (event)        {  
             var jsDate = moment(event.args.date).add(1, 'd'); 
             var fecha = jsDate.toISOString().slice(0, 10).replace(/-/g, '');
@@ -137,6 +149,7 @@
                     { text: 'Plazo', datafield: 'plazo', width: 50 },
                     { text: 'Especie', datafield: 'especie', width: 90},
                     { text: 'Colocacion', datafield: 'colocacion', width: 0, hidden: true },
+                    { text: 'Precio Minimo C', datafield: 'precioMinimoC', width: 0, hidden: true },
                     { text: 'Titulo Competitivo', datafield: 'tituloC', width: 0, hidden: true},
                     { text: 'Titulo No Competitivo Persona Juridica', datafield: 'tituloNCJ', width: 0, hidden: true},
                     { text: 'Titulo No Competitivo Persona Fisica', datafield: 'tituloNCF', width: 0, hidden: true},
@@ -176,8 +189,11 @@
                     $("#grillaPlazos").jqxGrid('addrow', plazoItem.id, plazoItem);
                 });
                 $("#instrumentoLebac").val(data.instrumento);
+                $("#pausarCierre").val(data.pausarCierre);
+                
             }, 'json');
         };
+        
         
         $('#form').jqxValidator({ rules: [
             { input: '#grillaPlazos', message: 'Debe ingresar al menos un plazo', action: 'blur', rule: function(){
@@ -222,6 +238,7 @@
                         plazo: filaPlazo.plazo,
                         especie: filaPlazo.especie,
                         colocacion: filaPlazo.colocacion,
+                        precioMinimoC: filaPlazo.precioMinimoC,
                         tituloC: filaPlazo.tituloC,
                         tituloNCJ: filaPlazo.tituloNCJ,
                         tituloNCF: filaPlazo.tituloNCF,
@@ -235,7 +252,8 @@
                     fechahora: fechaHora.format("YYYY-MM-DD HH:mm") + ":00",
                     plazos: plazos,
                     plazosBorrar: plazo.borrar,
-                    instrumento: $("#instrumentoLebac").val()
+                    instrumento: $("#instrumentoLebac").val(),
+                    pausarCierre: $("#pausarCierre").val()
                 };
                 $.post('/lebac/saveCierre', datos, function(data){
                     if (data.id > 0){
@@ -276,15 +294,16 @@
         $("#plazo").jqxNumberInput({ width: '300px', height: '20px', theme:theme, digits:3, decimalDigits: 0});
         $("#especie").jqxInput({ width: '300px', height: '20px', theme: theme});
         $("#colocacion").jqxNumberInput({ width: '300px', height: '20px', theme:theme, digits:6, decimalDigits: 0});
-        $("#tituloC").jqxInput({ width: '300px', height: '20px', theme: theme});
-        $("#tituloNCJ").jqxInput({ width: '300px', height: '20px', theme: theme});
-        $("#tituloNCF").jqxInput({ width: '300px', height: '20px', theme: theme});
+        $("#precioMinimoC").jqxNumberInput({ width: '300px', height: '20px', theme:theme, digits:6, decimalDigits: 2});
+        $("#tituloC").jqxInput({ width: '900px', height: '20px', theme: theme});
+        $("#tituloNCJ").jqxInput({ width: '900px', height: '20px', theme: theme});
+        $("#tituloNCF").jqxInput({ width: '900px', height: '20px', theme: theme});
         $("#segmento").jqxDropDownList({ width: '300px', height: '25px', source: ['I','E'], theme: theme, placeHolder: 'elija el segmento'});
 
         
         $('#aceptarPlazo').jqxButton({ theme: theme, width: '100px', height: '25px' });
 
-        $("#ventanaPlazo").jqxWindow({showCollapseButton: false, maxHeight:800, height: 340, width: 610, theme: theme,
+        $("#ventanaPlazo").jqxWindow({showCollapseButton: false, maxHeight:800, maxWidth:1200, height: 340, width: 1200, theme: theme,
             resizable: false, keyboardCloseKey: -1, autoOpen: false, zIndex: 19000, isModal: true});
         
         $("#nuevoPlazo").bind('click',function(){
@@ -308,6 +327,7 @@
             $("#plazo").val(fila.plazo);
             $("#especie").val(fila.especie);
             $("#colocacion").val(fila.colocacion);
+            $("#precioMinimoC").val(fila.precioMinimoC);
             $("#tituloC").val(fila.tituloC);
             $("#tituloNCJ").val(fila.tituloNCJ);
             $("#tituloNCF").val(fila.tituloNCF);
@@ -343,6 +363,7 @@
             $("#plazo").val(0);
             $("#especie").val('');
             $("#colocacion").val(0);
+            $("#precioMinimoC").val(0);
             $("#tituloC").val('');
             $("#tituloNCJ").val('');
             $("#tituloNCF").val('');
@@ -398,6 +419,7 @@
                     plazo: $("#plazo").val(),
                     especie: $("#especie").val(),
                     colocacion: $("#colocacion").val(),
+                    precioMinimoC: $("#precioMinimoC").val(),
                     tituloC: $("#tituloC").val(),
                     tituloNCJ: $("#tituloNCJ").val(),
                     tituloNCF: $("#tituloNCF").val(),

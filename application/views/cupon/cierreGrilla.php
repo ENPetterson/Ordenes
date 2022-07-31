@@ -5,6 +5,9 @@
         var id = 0;
         var fechaCierre;
 
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
+
+
         var source =
         {
                 datatype: "json",
@@ -51,7 +54,7 @@
                 autoheight: true,
                 pageable: true,
                 virtualmode: true,
-                width: 220,
+                width: 340,
                 rendergridrows: function(obj)
                 {
                         return obj.data;    
@@ -115,7 +118,12 @@
         
     });
 </script>
+<br>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Grilla Cierre Cupon</ul></div>
+<br>
+<br>
 <div id="grilla"></div>
+<br>
 <div>
     <table boder="0" cellpadding="2" cellspacing="2">
         <tr>

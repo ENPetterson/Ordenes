@@ -175,7 +175,7 @@
                 var rowcount = rows.length;
                 return (rowcount > 0);
             }},
-            { input: '#instrumentoLetesPesos', message: 'Debe ingresar el nombre del instrumento!',  rule: 'required' }
+//            { input: '#instrumentoLetesPesos', message: 'Debe ingresar el nombre del instrumento!',  rule: 'required' }
             /*
             { input: '#instrumentoLetesPesos', message: 'No existe un instrumento con ese nombre!',  rule: function(){
                 var resultado;
@@ -323,9 +323,9 @@
                 { input: '#moneda', message: 'Debe seleccionar la moneda!',  rule: function(){
                     return ($("#moneda").jqxDropDownList('getSelectedIndex') !== -1)
                 } },
-                { input: '#plazo', message: 'El plazo debe ser mayor a 27!',  rule: function(){
-                    return $("#plazo").val() > 27;
-                } },
+//                { input: '#plazo', message: 'El plazo debe ser mayor a 27!',  rule: function(){
+//                    return $("#plazo").val() > 27;
+//                } },
                 { input: '#plazo', message: 'El plazo debe ser menor a 999!',  rule: function(){
                     return $("#plazo").val() < 999;
                 } },            
@@ -333,9 +333,9 @@
                 { input: '#colocacion', message: 'Debe ingresar el numero de colocación!',  rule: function(){
                     return $("#colocacion").val() > 30;
                 } },
-                { input: '#tituloC', message: 'Debe ingresar el nombre del titulo competitivo!',  rule: 'required' },
-                { input: '#tituloNCJ', message: 'Debe ingresar el nombre del título no competitivo personas juridicas!',  rule: 'required' },
-                { input: '#tituloNCF', message: 'Debe ingresar el nombre del titulo no competitivo personas físicas!',  rule: 'required' }
+//                { input: '#tituloC', message: 'Debe ingresar el nombre del titulo competitivo!',  rule: 'required' },
+//                { input: '#tituloNCJ', message: 'Debe ingresar el nombre del título no competitivo personas juridicas!',  rule: 'required' },
+//                { input: '#tituloNCF', message: 'Debe ingresar el nombre del titulo no competitivo personas físicas!',  rule: 'required' }
             ],
             theme: theme
         });

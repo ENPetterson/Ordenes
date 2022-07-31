@@ -5,7 +5,9 @@
         var id = 0;
         var enviar = [];
         var cierreletespesos_id = 0;
-        
+
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
+
         var srcCierre = {
             datatype: "json",
             datafields: [
@@ -45,7 +47,7 @@
                 { name: 'numComitente', type: 'number'},
                 { name: 'moneda'},
                 { name: 'cable', type: 'bool'},
-                { name: 'plazo', type: 'number'},
+                { name: 'plazo'},
                 { name: 'comision', type: 'float'},
                 { name: 'cantidad', type: 'number'},
                 { name: 'precio', type: 'float'},
@@ -81,7 +83,7 @@
                 showstatusbar: true,
                 statusbarheight: 25,
                 showaggregates: true,
-                width: 1480,
+                width: 1550,
                 height: 600,
                 columns: [
                         { text: 'Id', datafield: 'id', width: 80, cellsalign: 'right', cellsformat: 'd', aggregates: ['count']  },
@@ -89,7 +91,7 @@
                         { text: 'Nro Comitente', datafield: 'numComitente', width: 70},
                         { text: 'Mone', datafield: 'moneda', width: 30},
                         { text: 'Cable', datafield: 'cable', width: 30, columntype: 'checkbox'},
-                        { text: 'Plazo', datafield: 'plazo', width: 40, cellsalign: 'right'},
+                        { text: 'Plazo', datafield: 'plazo', width: 100, cellsalign: 'right'},
                         { text: 'Comis', datafield: 'comision', width: 60, cellsalign: 'right', cellsformat: 'd4'},
                         { text: 'Cantidad', datafield: 'cantidad', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum']},
                         { text: 'Precio', datafield: 'precio', width: 100, cellsalign: 'right', cellsformat: 'd10'},
@@ -203,6 +205,9 @@
     });
 </script>
 <div id="cierre"></div>
+<br>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Grilla Letes Pesos</ul></div>
+<br>
 <br>
 <div id="grilla"></div>
 <div id="botonera">

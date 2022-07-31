@@ -1,5 +1,6 @@
 <input type="hidden" id="id" value="<?php echo $id;?>" >
 <input type="hidden" id="origen" value="<?php echo $origen;?>" >
+<input type="hidden" id="cierre" value="<?php echo $cierre;?>" >
 <div id="ventanaLebac">
     <div id="titulo">
         Editar Orden Lebac
@@ -74,13 +75,18 @@
         var plazoCargado = 0;
         var cierre_id = 0;
         var numComitente = 0;
-        
+//        var precioMinimo = 0;
        
         $("#filaPrecio").hide();
         
         $("#ventanaLebac").jqxWindow({showCollapseButton: false, height: 500, width: 470, theme: theme, resizable: false, keyboardCloseKey: -1});
-        $("#tramo").jqxDropDownList({ width: '300px', height: '25px', source: ['No Competitiva', 'Competitiva'], theme: theme, selectedIndex: 0, disabled: true});
+        $("#tramo").jqxDropDownList({ width: '300px', height: '25px', source: ['No Competitiva', 'Competitiva'], theme: theme, selectedIndex: 0, disabled: false});
         //$("#tramo").jqxDropDownList({ width: '300px', height: '25px', source: ['No Competitiva', 'Competitiva'], theme: theme, selectedIndex: 0, disabled: false});
+        
+//        $("#tramo").jqxDropDownList({selectedIndex: 0 });
+//        $("#tramo").jqxDropDownList({ disabled: true }); 
+        
+        
         $("#numComitente").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 9, groupSeparator: ' ', max: 999999999});
         var srcMonedas = {
             datatype: 'json',
@@ -97,44 +103,57 @@
         $("#moneda").jqxDropDownList({ width: '300px', height: '25px', source: DAMonedas, theme: theme, placeHolder: 'elija la moneda', displayMember: 'nombre', valueMember: 'simbolo'});
         $("#plazo").jqxDropDownList({ width: '110px', height: '25px', theme: theme, placeHolder: 'elija plazo'});
         $("#comision").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 1, groupSeparator: ' ', max: 99, theme: theme});
-        $("#cantidad").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 0, digits: 12, groupSeparator: ' ', max: 999999999999, theme: theme});
+        $("#cantidad").jqxNumberInput({ width: '130px', height: '25px', decimalDigits: 0, digits: 12, groupSeparator: ' ', max: 999999999999, theme: theme});
         /*$("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 6, digits: 1, groupSeparator: ' ', max: 999999999.999999, theme: theme});*/
         $("#precio").jqxNumberInput({ width: '110px', height: '25px', decimalDigits: 2, digits: 4, groupSeparator: ' ', max: 9999.99, theme: theme});
-        $("#comitente").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
-        $("#tipoPersona").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
-        $("#oficial").jqxInput({ width: '300px', height: '25px', disabled: true, theme: theme});
-        $("#cuit").jqxInput({ width: '110px', height: '25px', disabled: true, theme: theme});
+        $("#comitente").jqxInput({ width: '300px', height: '25px', disabled: false, theme: theme});
+        $("#tipoPersona").jqxInput({ width: '300px', height: '25px', disabled: false, theme: theme});
+        $("#oficial").jqxInput({ width: '300px', height: '25px', disabled: false, theme: theme});
+        $("#cuit").jqxInput({ width: '110px', height: '25px', disabled: false, theme: theme});
         
         $('#numComitente').on('valueChanged', function (event) {
             var value = $("#numComitente").val();
-            $.post('/esco/getComitente', {numComitente: value}, function(pComitente){
-                comitente = pComitente;
-                if (pComitente){
-                    $("#comitente").val(pComitente.comitente);
-                    if (pComitente.esFisico == -1){
+            //$.post('/esco/getComitente', {numComitente: value}, function(pComitente){
+                //comitente = pComitente;
+                //if (pComitente){
+
+                    if ($('#numComitente').val() == 0){
+                        $("#comitente").val('');
+                        $("#tipoPersona").val(''); 
+                        $("#oficial").val('');
+                        $("#cuit").val('');
+                        $('#form').jqxValidator('hideHint', '#numComitente');
+                    }
+                    else if ($('#numComitente').val() == 1){
+                        $("#comitente").val('COMIT 1');
                         $("#tipoPersona").val('FISICA'); 
-                    } else {
+                        $("#oficial").val('CHARANGO');
+                        $("#cuit").val('27345366291');
+                        $('#form').jqxValidator('hideHint', '#numComitente');
+                    }
+                    else{
+                        $("#comitente").val('OTRO COMIT');
                         $("#tipoPersona").val('JURIDICA'); 
+                        $("#oficial").val('OTRO');
+                        $("#cuit").val('27345366301');
+                        $('#form').jqxValidator('hideHint', '#numComitente');
                     }
-                    $("#oficial").val(pComitente.oficial);
-                    $("#cuit").val(pComitente.cuit);
-                    $('#form').jqxValidator('hideHint', '#numComitente');
-                    if (!bowser.msie){
-                        $("#ventanaResumen").jqxWindow('open');
-                        srcOrdenes.data = {cierre_id: cierre_id, numComitente: $('#numComitente').val()};
-                        $("#grillaOrdenes").jqxGrid('updatebounddata');
-                    }
-                } else {
-                    $("#comitente").val('');
-                    $("#tipoPersona").val(''); 
-                    $("#oficial").val('');
-                    $("#cuit").val('');
-                    $("#ventanaResumen").jqxWindow('close');
-                }
-            }, 'json');
+                    //if (!bowser.msie){
+                    //    $("#ventanaResumen").jqxWindow('open');
+                    //    srcOrdenes.data = {cierre_id: cierre_id, numComitente: $('#numComitente').val()};
+                    //    $("#grillaOrdenes").jqxGrid('updatebounddata');
+                    //}
+                //} else {
+                //    $("#comitente").val('');
+                //    $("#tipoPersona").val(''); 
+                //    $("#oficial").val('');
+                //    $("#cuit").val('');
+                //    $("#ventanaResumen").jqxWindow('close');
+                //}
+            //}, 'json');
         });
         
-        
+        /*
         $('#cantidad').on('valueChanged', function (event) {
             var value = $("#cantidad").val();
             if (value < 2000000){
@@ -144,17 +163,29 @@
                 $("#tramo").val('Competitiva');
                 $("#tramo").jqxDropDownList({selectedIndex: 1 });
                 $("#tramo").jqxDropDownList({ disabled: true }); 
-                /*
-                if (value >= 10000000) {
-                    $("#tramo").jqxDropDownList({ disabled: true }); 
-                } else {
-                    $("#tramo").jqxDropDownList({ disabled: false }); 
-                }
-                */
+                
+                //if (value >= 10000000) {
+                //    $("#tramo").jqxDropDownList({ disabled: true }); 
+                //} else {
+                //    $("#tramo").jqxDropDownList({ disabled: false }); 
+                //}
+                
             }
         });
-        
-        
+        */
+
+        $('#cantidad').on('valueChanged', function (event) {
+            var value = $("#cantidad").val();
+            if (value <= 3000000){
+                $("#tramo").jqxDropDownList({selectedIndex: 0 });
+                $("#tramo").jqxDropDownList({ disabled: false }); 
+            } else {
+                $("#tramo").jqxDropDownList({selectedIndex: 1 });
+                $("#tramo").jqxDropDownList({ disabled: true }); 
+            }
+        });
+
+
         $("#tramo").on('change', function(event){
             var args = event.args;
             if (args){
@@ -189,7 +220,13 @@
             if (args){
                 plazoCargado = args.item.value;
             }
+            $('#form').jqxValidator('hideHint', '#precio');
+            $("#precio").val(0);
         });
+        
+//        $("#precio").on('change', function(event){
+//            $('#form').jqxValidator('hideHint', '#precio');
+//        });
         
     
         if ($("#id").val() == 0){
@@ -215,22 +252,33 @@
             }
             , 'json');
         };
-         $('#form').jqxValidator({ rules: [
-                { input: '#numComitente', message: 'Debe Seleccionar un comitente existente!', action: 'keyup, blur',  rule: function(){
-                    var result;
-                    if (!comitente){
-                        result = false;
-                    } else {
-                        result = true;
-                    }
-                    return result;
-                }},
-                { input: '#moneda', message: 'Debe Seleccionar la moneda!', action: 'keyup, blur',  rule: function(){
-                    return ($("#moneda").jqxDropDownList('getSelectedIndex') != -1);
-                }},
-                { input: '#plazo', message: 'Debe elegir el plazo!', action: 'change',  rule: function(){
-                    return ($("#plazo").val() >= 28);
-                }},
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+            
+            
+            /*
                 { input: '#cantidad', message: 'Cantidad incorrecta!', action: 'keyup, blur',  rule: function(){
                     var result = true;
                     var minimo;
@@ -267,6 +315,148 @@
                     return result;
                 }},
                 
+                */
+               
+               
+//                if ($("#precio").jqxDropDownList('getSelectedIndex') == 0){
+//                        if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#precio").val() == 0){
+//                            minimo = 10000;
+//                        } else {
+//                            minimo = 10000;
+//                        }
+//                        multiplo = 1;
+//                        maximo = 2000000;
+//                    } else {
+//                        minimo = 1000000;
+//                        multiplo = 1;
+//                        maximo = 0;
+//                    }
+//                }},
+
+
+                /*
+                { input: '#precio', message: 'Precio minimo 953.03 para plazo 60!', action: 'keyup, blur',  rule: function(){
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#plazo").val() == '60' && $("#precio").val() < 953.03 ) {
+//                    if ($("#plazo").val() == '50' && $("#precio").val() < 949.82 ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }},   
+            
+                { input: '#precio', message: 'Precio minimo 991.13 para plazo de 364!', action: 'keyup, blur',  rule: function(){
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#plazo").val() == '364' && $("#precio").val() < 991.13 ) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }},   
+                */
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+         $('#form').jqxValidator({ rules: [
+                //{ input: '#numComitente', message: 'Debe Seleccionar un comitente existente!', action: 'keyup, blur',  rule: function(){
+                    //var result;
+                    //if (!comitente){
+                    //    result = false;
+                    //} else {
+                    //    result = true;
+                    //}
+                    //return result;
+                //}},
+
+                { input: '#numComitente', message: 'El comitente no puede ser 0!', action: 'keyup, blur',  rule: function(){
+                    if ($("#numComitente").val() > 0) {
+                        return true;
+                    } else {
+                       return false;
+                    }
+                }},
+
+                { input: '#moneda', message: 'Debe Seleccionar la moneda!', action: 'keyup, blur',  rule: function(){
+                    return ($("#moneda").jqxDropDownList('getSelectedIndex') != -1);
+                }},
+                { input: '#plazo', message: 'Debe elegir el plazo!', action: 'change',  rule: function(){
+                    return ($("#plazo").val() >= 28);
+                }},
+            
+            
+            { input: '#cantidad', message: 'Cantidad incorrecta!', action: 'keyup, blur',  rule: function(){
+                    var result = true;
+                    var minimo = 10000;
+                    var multiplo;
+                    var maximo = 0;
+
+                    var cantidad = $("#cantidad").val();
+
+                    if (cantidad < 10000){
+                        $('#form').jqxValidator('rules')[3].message = "La cantidad debe ser mayor o igual que " + minimo.toString() + "!";
+                        result = false;
+                    }
+                    return result;
+                }},
+                
+//            { input: '#precio', message: 'precio incorrecto!', action: 'keyup, blur',  rule: function(){
+//                var result = true;
+//                var min = 10;
+//
+//
+//                if ($("#precio").val() < min){
+//                    $('#form').jqxValidator('rules')[4].message = "La precio debe ser mayor que " + min.toString() + "!";
+//                    result = false;
+//                }
+//                return result;
+//            }},
+            
+                { input: '#precio', message: 'Precio minimo', action: 'keyup, blur',  rule: function(){
+                    var precioMinimo = 0;
+                    var result = true;
+                    var datos = {
+                        tramo: $("#tramo").val(),
+                        cierre: $("#cierre").val(),
+                        plazo: $("#plazo").val()
+                    };
+                    
+                    jQuery.ajaxSetup({async:false});
+                    
+                    $.post('/lebac/getPrecioMinimoPlazo', datos, function(data){
+                        precioMinimo = data;
+                    }, 'json');
+                    
+                    jQuery.ajaxSetup({async:true});
+                    
+                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#precio").val() < precioMinimo ) {
+                        $('#form').jqxValidator('rules')[4].message = "Precio debe ser mayor que " + precioMinimo.toString() + "!";
+                        result = false;
+                    } else {
+                        result = true;
+                    }
+                    return result;
+                }}, 
+            
+            
+            
+                
+                
                 { input: '#comision', message: 'Valor incorrecto!', action: 'keyup, blur',  rule: function(){
                     if ($("#comision").val() > 3) {
                         return false;
@@ -274,13 +464,15 @@
                         return true;
                     }
                 }},
-                { input: '#precio', message: 'El precio debe ser mayor que cero!', action: 'keyup, blur',  rule: function(){
-                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#precio").val() == 0) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }},
+            
+//                { input: '#precio', message: 'El precio debe ser mayor que cero!', action: 'keyup, blur',  rule: function(){
+//                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1 && $("#precio").val() == 0) {
+//                        return false;
+//                    } else {
+//                        return true;
+//                    }
+//                }},
+            
 //                { input: '#precio', message: 'El precio debe expresarse como 0,XXXXXX !', action: 'keyup, blur',  rule: function(){
 //                    if ($('#tramo').jqxDropDownList('getSelectedIndex') == 1  && $("#precio").val() >= 1) {
 //                        return false;

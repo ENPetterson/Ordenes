@@ -40,6 +40,8 @@
             cierreFecha = event.args.item.label;
         });
 
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
+
         var source = {
             datatype: "json",
             datafields: [
@@ -252,6 +254,9 @@
     });
 </script>
 <div id="cierre"></div>
+<br>
+<div id="sistema" style='float: left; vertical-align: text-bottom; text-align: left;'><ul>Procesar Letes</ul></div>
+<br>
 <br>
 <div id="grilla"></div>
 <div id="botonera">

@@ -6,7 +6,9 @@
         var enviar = [];
         var cierreletespesos_id = 0;
         var cierreFecha;
-        
+
+        $("#sistema").jqxMenu({width: 200, height: 25, theme: theme});
+
         var srcCierre = {
             datatype: "json",
             datafields: [
@@ -48,7 +50,7 @@
                 { name: 'numComitente', type: 'number'},
                 { name: 'moneda'},
                 { name: 'cable', type: 'bool'},
-                { name: 'plazo', type: 'number'},
+                { name: 'plazo'},
                 { name: 'comision', type: 'float'},
                 { name: 'cantidad', type: 'number'},
                 { name: 'tenencia', type: 'number'},
@@ -86,18 +88,18 @@
                 showstatusbar: true,
                 statusbarheight: 25,
                 showaggregates: true,
-                width: 1680,
+                width: 1800,
                 height: 400,
                 columns: [
                         { text: 'Id', datafield: 'id', width: 80, cellsalign: 'right', cellsformat: 'd', aggregates: ['count'] },
                         { text: 'Tramo', datafield: 'tramo', width: 110 },
-                        { text: 'Nro Comitente', datafield: 'numComitente', width: 70},
+                        { text: 'Nro Comitente', datafield: 'numComitente', width: 65},
                         { text: 'Mone', datafield: 'moneda', width: 30},
                         { text: 'Cable', datafield: 'cable', width: 30, columntype: 'checkbox'},
-                        { text: 'Plazo', datafield: 'plazo', width: 40, cellsalign: 'right'},
+                        { text: 'Plazo', datafield: 'plazo', width: 100, cellsalign: 'right'},
                         { text: 'Comis', datafield: 'comision', width: 60, cellsalign: 'right', cellsformat: 'd4'},
                         { text: 'Cantidad', datafield: 'cantidad', width: 140, cellsalign: 'right', cellsformat: 'd', aggregates: ['sum'] },
-                        { text: 'Tenencia', datafield: 'tenencia', width: 140, cellsalign: 'right', cellsformat: 'd' },
+                        { text: 'Tenencia', datafield: 'tenencia', width: 30, cellsalign: 'right', cellsformat: 'd' },
                         { text: 'Posicion', datafield: 'posicion', width: 140, cellsalign: 'right', cellsformat: 'd' , hidden: true},
                         { text: 'Precio', datafield: 'precio', width: 100, cellsalign: 'right', cellsformat: 'd10'},
                         { text: 'Comitente', datafield: 'comitente', width: 200},
@@ -340,6 +342,8 @@
     });
 </script>
 <div id="cierre"></div>
+<br>
+<div id="sistema" style='float: left; margin-left: 0px; margin-bottom: 10px; text-align: left; vertical-align: text-bottom;'><ul>Procesar Letes Pesos</ul></div>
 <br>
 <div id="grilla"></div>
 <div id="botonera">
